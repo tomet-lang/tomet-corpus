@@ -1,0 +1,11 @@
+# Build artifacts
+target/
+dist/
+.direnv/
+
+# Wikipedia data directory (raw dumps, cached API responses, and generated pages)
+/wikipedia
+
+# IDE and OS files
+.DS_Store
+Thumbs.db

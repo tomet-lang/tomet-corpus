@@ -1,0 +1,33 @@
+[book]
+title = "tomet-sandbox"
+lang = "ja"
+src = "."
+dest = "dist"
+
+[ui]
+rail_title = "sandobox"
+default_view = "book"
+
+[[ui.hero_chips]]
+key = "parent"
+label = "所属"
+
+[[ui.hero_chips]]
+key = "type.list-a"
+label = "ファン"
+
+[[ui.hero_chips]]
+key = "type.element-a"
+
+[[ui.hero_chips]]
+key = "birth"
+format = "birthday"
+
+[build]
+exclude = [
+  "00-09 System/01 Apps",
+  ".git",
+  ".tomet",
+  ".direnv",
+  ".nix"
+]
