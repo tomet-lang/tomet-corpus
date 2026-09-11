@@ -10,3 +10,27 @@ wiki-build:
 
 wiki-dev:
     {{ tmtbook }} serve
+
+wiki-check:
+    cargo run -q -- wiki check
+
+wiki-check-strict:
+    cargo run -q -- wiki check && {{ tmtbook }} build --strict
+
+check target="wikipedia/pages":
+    cargo run -q -- check -p {{ target }}
+
+stats target="wikipedia/pages":
+    cargo run -q -- stats -p {{ target }}
+
+sync-random n="5":
+    cargo run -q -- wiki sync --random {{ n }} --build
+
+build:
+    cargo run -q -- build --strict
+
+serve:
+    cargo run -q -- serve
+
+test:
+    cargo test

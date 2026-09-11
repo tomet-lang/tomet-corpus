@@ -506,11 +506,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1789036649,
-        "narHash": "sha256-gWtLUK+64qNGsxsyChcpF5a7umNublDC9ZAbHXuFu9U=",
+        "lastModified": 1789086256,
+        "narHash": "sha256-VRCEYQMNx4BQxcyg6hup1fin6we/+eBwpsUfJ/ejHX8=",
         "ref": "refs/heads/main",
-        "rev": "362850928749772ae28e062bfcde06df1eb4376e",
-        "revCount": 20,
+        "rev": "019c273846853cb0b57b6f13c1c20f7a564c118f",
+        "revCount": 39,
         "type": "git",
         "url": "https://github.com/tomet-lang/tomet-book"
       },

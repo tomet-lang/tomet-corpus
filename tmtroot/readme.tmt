@@ -1,1 +1,5 @@
-- @link(https://dumps.wikimedia.org/jawiki/latest/)
+- Wikipedia (ja)
+  - @link(https://dumps.wikimedia.org/jawiki/latest/)
+- Wiktionary
+- 青空文庫（Aozora Bunko / 文学作品）
+  - 青空文庫特有の「ルビ（ふりがな）」や「注記」を Tomet 構文にマッピング。
