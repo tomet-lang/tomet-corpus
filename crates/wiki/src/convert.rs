@@ -1,128 +1,8 @@
 use std::collections::HashMap;
-use std::path::{Path, PathBuf};
 
-use anyhow::{Context, Result};
-use clap::Args;
 use regex::{Captures, Regex};
 
-use super::download::sanitize_filename;
-use super::model::WikiPage;
-
-#[derive(Args, Debug, Clone)]
-pub struct ConvertArgs {
-    /// Directory containing raw downloaded JSON files
-    #[arg(short, long, default_value = "wikipedia/raw")]
-    pub input_dir: PathBuf,
-
-    /// Output directory for .tmt files
-    #[arg(short, long, default_value = "wikipedia/pages")]
-    pub output_dir: PathBuf,
-
-    /// Specific article title(s) to convert
-    #[arg(short, long)]
-    pub title: Vec<String>,
-
-    /// Overwrite existing converted files
-    #[arg(short, long, default_value_t = false)]
-    pub force: bool,
-}
-
-pub async fn run_convert(args: ConvertArgs) -> Result<()> {
-    tokio::fs::create_dir_all(&args.output_dir)
-        .await
-        .with_context(|| format!("failed to create output dir: {:?}", args.output_dir))?;
-
-    let mut files_to_convert: Vec<PathBuf> = Vec::new();
-
-    if !args.title.is_empty() {
-        for t in &args.title {
-            let filename = sanitize_filename(t) + ".json";
-            let path = args.input_dir.join(filename);
-            if path.exists() {
-                files_to_convert.push(path);
-            } else {
-                eprintln!("Warning: input file not found: {:?}", path);
-            }
-        }
-    } else {
-        let mut entries = tokio::fs::read_dir(&args.input_dir).await.with_context(|| {
-            format!("failed to read input directory {:?}", args.input_dir)
-        })?;
-
-        while let Some(entry) = entries.next_entry().await? {
-            let path = entry.path();
-            if path.is_file() && path.extension().and_then(|s| s.to_str()) == Some("json") {
-                files_to_convert.push(path);
-            }
-        }
-    }
-
-    if files_to_convert.is_empty() {
-        println!("No JSON files found in {:?}", args.input_dir);
-        return Ok(());
-    }
-
-    println!(
-        "Converting {} article(s) from {:?} to {:?}",
-        files_to_convert.len(),
-        args.input_dir,
-        args.output_dir
-    );
-
-    let converter = WikiToTometConverter::new();
-    let mut success_count = 0;
-    let mut failed_count = 0;
-
-    for input_path in files_to_convert {
-        let filename = input_path.file_stem().unwrap().to_string_lossy();
-        let target_path = args.output_dir.join(format!("{}.tmt", filename));
-
-        if target_path.exists() && !args.force {
-            println!("Skipping existing {:?}", target_path);
-            continue;
-        }
-
-        match process_file(&converter, &input_path, &target_path).await {
-            Ok(title) => {
-                println!("Converted '{}' -> {:?}", title, target_path);
-                success_count += 1;
-            }
-            Err(e) => {
-                eprintln!("Failed to convert {:?}: {}", input_path, e);
-                failed_count += 1;
-            }
-        }
-    }
-
-    println!();
-    println!(
-        "Conversion finished: {} succeeded, {} failed",
-        success_count, failed_count
-    );
-
-    Ok(())
-}
-
-async fn process_file(
-    converter: &WikiToTometConverter,
-    input_path: &Path,
-    target_path: &Path,
-) -> Result<String> {
-    let content = tokio::fs::read_to_string(input_path)
-        .await
-        .with_context(|| format!("failed to read {:?}", input_path))?;
-
-    let page: WikiPage = serde_json::from_str(&content)
-        .with_context(|| format!("failed to parse JSON from {:?}", input_path))?;
-
-    let tmt_output = converter.convert(&page);
-
-    tokio::fs::write(target_path, tmt_output)
-        .await
-        .with_context(|| format!("failed to write {:?}", target_path))?;
-
-    Ok(page.title)
-}
+use crate::model::WikiPage;
 
 pub struct WikiToTometConverter {
     re_heading6: Regex,
@@ -133,15 +13,18 @@ pub struct WikiToTometConverter {
     re_bold_italic: Regex,
     re_bold: Regex,
     re_italic: Regex,
-    re_wiki_link: Regex,
     re_ext_link_text: Regex,
     re_ext_link_bare: Regex,
     re_ref_tags: Regex,
     re_ref_self_closing: Regex,
     re_gallery_tags: Regex,
+    re_math_tags: Regex,
+    re_chem_tags: Regex,
     re_html_comments: Regex,
+    re_html_tags: Regex,
     re_horizontal_rule: Regex,
     re_empty_bold: Regex,
+    re_bold_inner_space: Regex,
     re_consecutive_newlines: Regex,
 }
 
@@ -162,15 +45,18 @@ impl WikiToTometConverter {
             re_bold_italic: Regex::new(r"'''''(.*?)'''''").unwrap(),
             re_bold: Regex::new(r"'''(.*?)'''").unwrap(),
             re_italic: Regex::new(r"''(.*?)''").unwrap(),
-            re_wiki_link: Regex::new(r"\[\[([^\[\]\|]+)(?:\|([^\[\]]+))?\]\]").unwrap(),
             re_ext_link_text: Regex::new(r"\[(https?://[^\s\]]+)\s+([^\]]+)\]").unwrap(),
             re_ext_link_bare: Regex::new(r"\[(https?://[^\s\]]+)\]").unwrap(),
             re_ref_tags: Regex::new(r"(?s)<ref(?:\s+[^>/]*)?>.*?</ref>").unwrap(),
             re_ref_self_closing: Regex::new(r"<ref[^>]*?/>").unwrap(),
             re_gallery_tags: Regex::new(r"(?s)<gallery[^>]*>.*?</gallery>").unwrap(),
+            re_math_tags: Regex::new(r"(?s)<math(?:\s+[^>]*)?>(.*?)</math>").unwrap(),
+            re_chem_tags: Regex::new(r"(?s)<chem(?:\s+[^>]*)?>(.*?)</chem>").unwrap(),
             re_html_comments: Regex::new(r"(?s)<!--.*?-->").unwrap(),
+            re_html_tags: Regex::new(r"</?(?:ins|del|small|big|u|s|span|div|abbr|q)(?:\s+[^>]*)?>").unwrap(),
             re_horizontal_rule: Regex::new(r"(?m)^-{4,}\s*$").unwrap(),
             re_empty_bold: Regex::new(r"\*{4,}").unwrap(),
+            re_bold_inner_space: Regex::new(r"\*\*(\s*)([^\*\n]+?)(\s*)\*\*").unwrap(),
             re_consecutive_newlines: Regex::new(r"\n{3,}").unwrap(),
         }
     }
@@ -184,12 +70,25 @@ impl WikiToTometConverter {
             (Vec::new(), String::new())
         };
 
+        let (converted_body, categories) = if !clean_source.is_empty() {
+            self.convert_wikitext_with_categories(&clean_source)
+        } else {
+            (String::new(), Vec::new())
+        };
+
         // 1. @meta block
         out.push_str("@meta{\n");
         out.push_str(&format!("  id: {},\n", page.id));
         out.push_str(&format!("  title: \"{}\",\n", escape_string(&page.title)));
         if let Some(latest) = &page.latest {
             out.push_str(&format!("  timestamp: \"{}\",\n", latest.timestamp));
+        }
+        if !categories.is_empty() {
+            out.push_str("  categories: [\n");
+            for cat in &categories {
+                out.push_str(&format!("    \"{}\",\n", escape_string(cat)));
+            }
+            out.push_str("  ],\n");
         }
         for (k, v) in &infobox_fields {
             if let Ok(num) = v.parse::<i64>() {
@@ -204,8 +103,7 @@ impl WikiToTometConverter {
         out.push_str(&format!("# {}\n\n", page.title));
 
         // 3. Body transformation
-        if !clean_source.is_empty() {
-            let converted_body = self.convert_wikitext(&clean_source);
+        if !converted_body.is_empty() {
             out.push_str(&converted_body);
             out.push('\n');
         }
@@ -214,8 +112,25 @@ impl WikiToTometConverter {
     }
 
     pub fn convert_wikitext(&self, text: &str) -> String {
+        self.convert_wikitext_with_categories(text).0
+    }
+
+    pub fn convert_wikitext_with_categories(&self, text: &str) -> (String, Vec<String>) {
         // Strip HTML comments
         let text = self.re_html_comments.replace_all(text, "");
+
+        // Convert <math> and <chem> to inline code `...`
+        let text = self.re_math_tags.replace_all(&text, |caps: &Captures| {
+            let inner = caps[1].trim().replace('\n', " ");
+            format!("`{}`", inner)
+        });
+        let text = self.re_chem_tags.replace_all(&text, |caps: &Captures| {
+            let inner = caps[1].trim().replace('\n', " ");
+            format!("`{}`", inner)
+        });
+
+        // Strip HTML tags like <ins>, <small>, <div>, etc.
+        let text = self.re_html_tags.replace_all(&text, "");
 
         // Strip <ref> tags: self-closing first, then standard blocks
         let text = self.re_ref_self_closing.replace_all(&text, "");
@@ -230,32 +145,51 @@ impl WikiToTometConverter {
         // Convert or strip nested templates {{...}}
         let text = process_templates(&text);
 
-        // Convert MediaWiki tables {| ... |} to plain list lines
+        // Process internal links, categories, and remove image/file embeds safely with bracket nesting
+        let (text, categories) = process_wiki_brackets(&text);
+
+        // Convert MediaWiki tables {| ... |} to tomet @table syntax
         let text = process_tables(&text);
 
         // List bullets conversion BEFORE headings and bold conversion
-        // MediaWiki lists: '*' for bullet list, '#' for numbered list, ';' for term, ':' for def
+        // MediaWiki lists: prefix characters '*', '#', ':', ';'
         let mut result_lines = Vec::new();
         for line in text.lines() {
             let trimmed = line.trim_start();
-            if trimmed.starts_with('*') {
-                let count = trimmed.chars().take_while(|c| *c == '*').count();
-                let after_stars = &trimmed[count..];
-                let indent = "  ".repeat(count.saturating_sub(1));
-                result_lines.push(format!("{}- {}", indent, after_stars.trim_start()));
-            } else if trimmed.starts_with('#') {
-                let count = trimmed.chars().take_while(|c| *c == '#').count();
-                let after_hashes = &trimmed[count..];
-                let indent = "  ".repeat(count.saturating_sub(1));
-                result_lines.push(format!("{}1. {}", indent, after_hashes.trim_start()));
-            } else if trimmed.starts_with(':') {
-                let rest = trimmed.trim_start_matches(':').trim_start();
-                result_lines.push(format!("  {}", rest));
-            } else if trimmed.starts_with(';') {
-                let rest = trimmed.trim_start_matches(';').trim_start();
-                result_lines.push(format!("- **{}**", rest));
-            } else {
+            let prefix: String = trimmed
+                .chars()
+                .take_while(|c| *c == '*' || *c == '#' || *c == ':' || *c == ';')
+                .collect();
+
+            if prefix.is_empty() {
                 result_lines.push(line.to_string());
+                continue;
+            }
+
+            let rest = trimmed[prefix.len()..].trim_start();
+            let depth = prefix.len();
+            let indent = "  ".repeat(depth.saturating_sub(1));
+
+            let last_char = prefix.chars().last().unwrap();
+            match last_char {
+                '*' => result_lines.push(format!("{}- {}", indent, rest)),
+                '#' => result_lines.push(format!("{}1. {}", indent, rest)),
+                ':' => {
+                    if prefix.chars().all(|c| c == ':') {
+                        result_lines.push(format!("{}  {}", "  ".repeat(depth.saturating_sub(1)), rest));
+                    } else {
+                        result_lines.push(format!("{}- {}", indent, rest));
+                    }
+                }
+                ';' => {
+                    let rest_trimmed = rest.trim();
+                    if let Some((term, def)) = rest_trimmed.split_once(':') {
+                        result_lines.push(format!("{}- **{}**: {}", indent, term.trim(), def.trim()));
+                    } else {
+                        result_lines.push(format!("{}- **{}**", indent, rest_trimmed));
+                    }
+                }
+                _ => result_lines.push(line.to_string()),
             }
         }
         let text = result_lines.join("\n");
@@ -272,28 +206,11 @@ impl WikiToTometConverter {
         let text = self.re_bold.replace_all(&text, "**$1**");
         let text = self.re_italic.replace_all(&text, "*$1*");
 
+        // Normalize bold with inner whitespace: `** foo **` -> `**foo**`, `**foo **` -> `**foo** `
+        let text = self.re_bold_inner_space.replace_all(&text, "$1**$2**$3");
+
         // Remove empty bold artifacts (e.g. `****` left by stripped templates)
         let text = self.re_empty_bold.replace_all(&text, "");
-
-        // Convert internal links: [[Target|Label]] -> @link("./Target.tmt")[Label]
-        // Quote the path so parenthesis and special characters in Target don't break tomet parsing
-        let text = self.re_wiki_link.replace_all(&text, |caps: &Captures| {
-            let target = caps[1].trim();
-            let label = caps.get(2).map(|m| m.as_str().trim()).unwrap_or(target);
-
-            // Ignore files, images, categories
-            if target.starts_with("Category:")
-                || target.starts_with("カテゴリ:")
-                || target.starts_with("ファイル:")
-                || target.starts_with("File:")
-                || target.starts_with("画像:")
-            {
-                return String::new();
-            }
-
-            let file_target = sanitize_filename(target);
-            format!("@link(\"./{}.tmt\")[{}]", file_target, label)
-        });
 
         // Convert external links with quoted URL
         let text = self.re_ext_link_text.replace_all(&text, "@link(\"$1\")[$2]");
@@ -323,6 +240,33 @@ impl WikiToTometConverter {
         }
         let text = processed_lines.join("\n");
 
+        // Ensure bold pairs `**` are balanced on each line to prevent unclosed formatting errors
+        let mut balanced_lines = Vec::new();
+        for line in text.lines() {
+            let trimmed = line.trim();
+            let mut count = 0;
+            let mut in_code = false;
+            let chars: Vec<char> = trimmed.chars().collect();
+            let mut ci = 0;
+            while ci < chars.len() {
+                if chars[ci] == '`' {
+                    in_code = !in_code;
+                    ci += 1;
+                } else if !in_code && ci + 1 < chars.len() && chars[ci] == '*' && chars[ci + 1] == '*' {
+                    count += 1;
+                    ci += 2;
+                } else {
+                    ci += 1;
+                }
+            }
+            if count % 2 != 0 {
+                balanced_lines.push(format!("{}**", line));
+            } else {
+                balanced_lines.push(line.to_string());
+            }
+        }
+        let text = balanced_lines.join("\n");
+
         // Line-by-line cleanup:
         // 1. Remove empty list items (e.g. `- `, `-`, `1.`, `1. ` with no content)
         // 2. Remove rogue leading pipes
@@ -351,8 +295,161 @@ impl WikiToTometConverter {
         // Normalize excessive blank lines
         let text = self.re_consecutive_newlines.replace_all(&text, "\n\n");
 
-        text.trim().to_string()
+        (text.trim().to_string(), categories)
     }
+}
+
+/// Process [[...]] brackets handling arbitrary nesting, categorizing, and stripping files/images safely
+fn process_wiki_brackets(input: &str) -> (String, Vec<String>) {
+    let mut result = String::with_capacity(input.len());
+    let mut categories = Vec::new();
+    let chars: Vec<char> = input.chars().collect();
+    let n = chars.len();
+    let mut i = 0;
+
+    while i < n {
+        if i + 1 < n && chars[i] == '[' && chars[i + 1] == '[' {
+            let start = i;
+            let mut depth = 0;
+            let mut j = i;
+            while j + 1 < n {
+                if chars[j] == '[' && chars[j + 1] == '[' {
+                    depth += 1;
+                    j += 2;
+                } else if chars[j] == ']' && chars[j + 1] == ']' {
+                    depth -= 1;
+                    j += 2;
+                    if depth == 0 {
+                        break;
+                    }
+                } else {
+                    j += 1;
+                }
+            }
+
+            if depth == 0 {
+                let inner_slice: String = chars[start + 2..j - 2].iter().collect();
+                handle_wiki_bracket_content(&inner_slice, &mut result, &mut categories);
+                i = j;
+                continue;
+            }
+        }
+        result.push(chars[i]);
+        i += 1;
+    }
+
+    (result, categories)
+}
+
+fn split_bracket_pipe(inner: &str) -> Vec<String> {
+    let mut parts = Vec::new();
+    let mut bracket_depth = 0;
+    let mut brace_depth = 0;
+    let mut current = String::new();
+
+    for c in inner.chars() {
+        match c {
+            '[' => {
+                bracket_depth += 1;
+                current.push(c);
+            }
+            ']' => {
+                if bracket_depth > 0 {
+                    bracket_depth -= 1;
+                }
+                current.push(c);
+            }
+            '{' => {
+                brace_depth += 1;
+                current.push(c);
+            }
+            '}' => {
+                if brace_depth > 0 {
+                    brace_depth -= 1;
+                }
+                current.push(c);
+            }
+            '|' if bracket_depth == 0 && brace_depth == 0 => {
+                parts.push(current.trim().to_string());
+                current.clear();
+            }
+            _ => {
+                current.push(c);
+            }
+        }
+    }
+    parts.push(current.trim().to_string());
+    parts
+}
+
+fn clean_bracket_label(raw: &str) -> String {
+    let mut s = raw.to_string();
+    while let Some(start) = s.find("[[") {
+        if let Some(end) = s[start + 2..].find("]]") {
+            let actual_end = start + 2 + end;
+            let inner = &s[start + 2..actual_end];
+            let label = if let Some((_, l)) = inner.split_once('|') {
+                l.trim()
+            } else {
+                inner.trim()
+            };
+            s = format!("{}{}{}", &s[..start], label, &s[actual_end + 2..]);
+        } else {
+            break;
+        }
+    }
+    s.replace('[', "").replace(']', "").trim().to_string()
+}
+
+fn handle_wiki_bracket_content(inner: &str, out: &mut String, categories: &mut Vec<String>) {
+    let parts = split_bracket_pipe(inner);
+    if parts.is_empty() {
+        return;
+    }
+    let target = parts[0].trim();
+
+    // 1. Categories: "Category:" or "カテゴリ:" (excluding ":Category:")
+    if (target.starts_with("Category:") || target.starts_with("カテゴリ:")) && !target.starts_with(':') {
+        let cat_name = if let Some(stripped) = target.strip_prefix("Category:") {
+            stripped
+        } else if let Some(stripped) = target.strip_prefix("カテゴリ:") {
+            stripped
+        } else {
+            target
+        };
+        let clean_cat = cat_name.split('|').next().unwrap_or(cat_name).trim();
+        if !clean_cat.is_empty() && !categories.iter().any(|c| c == clean_cat) {
+            categories.push(clean_cat.to_string());
+        }
+        return;
+    }
+
+    // 2. Images and files: "ファイル:", "File:", "画像:", "Image:"
+    if (target.starts_with("ファイル:")
+        || target.starts_with("File:")
+        || target.starts_with("画像:")
+        || target.starts_with("Image:"))
+        && !target.starts_with(':')
+    {
+        return;
+    }
+
+    // 3. Normal internal link
+    let target_clean = target.trim_start_matches(':').trim();
+    let label = if parts.len() > 1 {
+        let last = parts.last().unwrap();
+        let cleaned = clean_bracket_label(last);
+        if cleaned.is_empty() {
+            target_clean.to_string()
+        } else {
+            cleaned
+        }
+    } else {
+        target_clean.to_string()
+    };
+
+    let file_target = sanitize_filename(target_clean);
+    out.push_str(&format!("@link(\"./{}.tmt\")[{}]", file_target, label));
 }
 
 /// Process and resolve or strip MediaWiki templates (handles nested {{ ... }})
@@ -568,6 +665,18 @@ fn transform_template(tmpl: &str) -> Option<String> {
                 parsed.positional.first().map(|s| s.to_string())
             }
         }
+        "isbn" => {
+            parsed.positional.first().map(|code| format!("ISBN: {}", code))
+        }
+        "issn" => {
+            parsed.positional.first().map(|code| format!("ISSN: {}", code))
+        }
+        "doi" => {
+            parsed.positional.first().map(|code| format!("DOI: {}", code))
+        }
+        "jpn" | "日本" => Some("日本".to_string()),
+        "usa" | "アメリカ合衆国" => Some("アメリカ合衆国".to_string()),
+        "デフォルトソート" | "normdaten" | "authority control" | "coord" => None,
         _ => {
             // Drop unhandled templates (navboxes, metadata tags, etc.)
             None
@@ -849,6 +958,17 @@ fn escape_string(s: &str) -> String {
     s.replace('\\', "\\\\").replace('"', "\\\"")
 }
 
+/// Sanitize filename for safe storage on all OS filesystems
+pub fn sanitize_filename(name: &str) -> String {
+    name.chars()
+        .map(|c| match c {
+            '/' | '\\' | ':' | '*' | '?' | '"' | '<' | '>' | '|' => '_',
+            ' ' => '_',
+            other => other,
+        })
+        .collect()
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -903,5 +1023,69 @@ mod tests {
         assert!(output.contains("創建: \"1900年\","));
         assert!(output.contains("本文です。"));
         assert!(!output.contains("{{神社"));
+
+        crate::validator::validate_tmt_string(&output)
+            .expect("generated tomet document must be valid syntax");
+    }
+
+    #[test]
+    fn test_nested_file_brackets_removal() {
+        let converter = WikiToTometConverter::new();
+        let input = "前文\n[[ファイル:King of Na gold seal.jpg|thumb|[[漢委奴国王印]]|代替文=]]\n後文。";
+        let output = converter.convert_wikitext(input);
+        assert!(!output.contains("ファイル:"));
+        assert!(!output.contains("漢委奴国王印"));
+        assert!(output.contains("前文"));
+        assert!(output.contains("後文。"));
+    }
+
+    #[test]
+    fn test_definition_list_with_trailing_spaces_and_sub_bullets() {
+        let converter = WikiToTometConverter::new();
+        let page = WikiPage {
+            id: 456,
+            key: "テスト映画".to_string(),
+            title: "テスト映画".to_string(),
+            latest: None,
+            content_model: Some("wikitext".to_string()),
+            license: None,
+            source: Some("; 翻案・演出 \n: [[監督]]\n; 映像ソフト\n:* 通常版\n:** 限定版（付録付き）\n".to_string()),
+        };
+        let output = converter.convert(&page);
+        assert!(output.contains("- **翻案・演出**"));
+        assert!(output.contains("- 通常版"));
+        assert!(output.contains("  - 限定版（付録付き）"));
+        crate::validator::validate_tmt_string(&output)
+            .expect("valid syntax for definition list and sub bullets");
+    }
+
+    #[test]
+    fn test_categories_extracted_to_meta() {
+        let converter = WikiToTometConverter::new();
+        let page = WikiPage {
+            id: 789,
+            key: "テスト国".to_string(),
+            title: "テスト国".to_string(),
+            latest: None,
+            content_model: Some("wikitext".to_string()),
+            license: None,
+            source: Some("国です。\n[[Category:アジアの国]]\n[[カテゴリ:島国]]\n".to_string()),
+        };
+        let output = converter.convert(&page);
+        assert!(output.contains("categories: ["));
+        assert!(output.contains("\"アジアの国\","));
+        assert!(output.contains("\"島国\","));
+        assert!(!output.contains("[[Category:"));
+        crate::validator::validate_tmt_string(&output)
+            .expect("valid syntax with categories in meta");
+    }
+
+    #[test]
+    fn test_math_tags_converted_to_code() {
+        let converter = WikiToTometConverter::new();
+        let input = "等式 <math>e^{i\\pi} + 1 = 0</math> は有名である。";
+        let output = converter.convert_wikitext(input);
+        assert!(output.contains("`e^{i\\pi} + 1 = 0`"));
+        assert!(!output.contains("<math>"));
     }
 }
