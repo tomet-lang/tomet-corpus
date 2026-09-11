@@ -3,6 +3,7 @@ use serde::{Deserialize, Serialize};
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct WikiPage {
     pub id: u64,
+    #[serde(default)]
     pub key: String,
     pub title: String,
     #[serde(default)]
@@ -25,37 +26,4 @@ pub struct WikiLatestRevision {
 pub struct WikiLicense {
     pub url: Option<String>,
     pub title: Option<String>,
-}
-
-#[derive(Debug, Deserialize)]
-pub struct ActionQueryResponse<T> {
-    pub query: Option<T>,
-}
-
-#[derive(Debug, Deserialize)]
-#[allow(dead_code)]
-pub struct RandomQueryResult {
-    pub random: Vec<RandomItem>,
-}
-
-#[derive(Debug, Deserialize)]
-#[allow(dead_code)]
-pub struct RandomItem {
-    pub id: u64,
-    pub ns: i32,
-    pub title: String,
-}
-
-#[derive(Debug, Deserialize)]
-#[allow(dead_code)]
-pub struct CategoryQueryResult {
-    pub categorymembers: Vec<CategoryMemberItem>,
-}
-
-#[derive(Debug, Deserialize)]
-#[allow(dead_code)]
-pub struct CategoryMemberItem {
-    pub pageid: u64,
-    pub ns: i32,
-    pub title: String,
 }

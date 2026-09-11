@@ -3,13 +3,14 @@ use std::time::Duration;
 
 use anyhow::{Context, Result};
 use clap::Args;
+use indicatif::{ProgressBar, ProgressStyle};
 use tokio::time::sleep;
 
-use super::client::WikiClient;
+use super::client::{MediaWikiClient, MediaWikiEndpoint};
 
 #[derive(Args, Debug, Clone)]
 pub struct DownloadArgs {
-    /// Title(s) of specific Wikipedia articles to download
+    /// Title(s) of specific articles to download
     #[arg(short, long)]
     pub title: Vec<String>,
 
@@ -25,9 +26,13 @@ pub struct DownloadArgs {
     #[arg(short, long, default_value_t = 10)]
     pub limit: usize,
 
-    /// Wikipedia language code (e.g., "ja", "en")
+    /// Language code (e.g., "ja", "en")
     #[arg(long, default_value = "ja")]
     pub lang: String,
+
+    /// Target host ("wikipedia", "wiktionary", or custom URL)
+    #[arg(long, default_value = "wikipedia")]
+    pub host: String,
 
     /// Output directory for raw downloaded JSON files
     #[arg(short, long, default_value = "wikipedia/raw")]
@@ -42,12 +47,13 @@ pub struct DownloadArgs {
     pub delay_ms: u64,
 }
 
-pub async fn run_download(args: DownloadArgs) -> Result<()> {
+pub async fn run_download(args: DownloadArgs) -> Result<Vec<PathBuf>> {
     tokio::fs::create_dir_all(&args.output_dir)
         .await
         .with_context(|| format!("failed to create output dir: {:?}", args.output_dir))?;
 
-    let client = WikiClient::new(&args.lang)?;
+    let endpoint = MediaWikiEndpoint::from_host_and_lang(&args.host, &args.lang);
+    let client = MediaWikiClient::new(endpoint)?;
     let mut titles_to_fetch: Vec<String> = args.title.clone();
 
     // 1. Fetch category titles if requested
@@ -68,21 +74,30 @@ pub async fn run_download(args: DownloadArgs) -> Result<()> {
 
     if titles_to_fetch.is_empty() {
         println!("No articles specified to download. Use --title, --random, or --category.");
-        println!("Example: cli wiki download --title '人工知能'");
-        return Ok(());
+        return Ok(Vec::new());
     }
 
     // Deduplicate titles
     titles_to_fetch.sort();
     titles_to_fetch.dedup();
 
+    let total = titles_to_fetch.len();
     println!(
-        "Downloading {} article(s) to {:?}",
-        titles_to_fetch.len(),
-        args.output_dir
+        "Downloading {} article(s) to {:?} [host: {}]",
+        total,
+        args.output_dir,
+        client.endpoint().base_url()
     );
 
-    let total = titles_to_fetch.len();
+    let progress = ProgressBar::new(total as u64);
+    progress.set_style(
+        ProgressStyle::default_bar()
+            .template("{spinner:.green} [{elapsed_precise}] [{bar:30.cyan/blue}] {pos}/{len} ({percent}%) {msg}")
+            .unwrap()
+            .progress_chars("#>-"),
+    );
+
+    let mut saved_files = Vec::new();
     let mut success_count = 0;
     let mut skipped_count = 0;
     let mut failed_count = 0;
@@ -91,40 +106,42 @@ pub async fn run_download(args: DownloadArgs) -> Result<()> {
         let filename = sanitize_filename(title) + ".json";
         let target_path = args.output_dir.join(&filename);
 
+        progress.set_message(format!("Fetching '{}'", title));
+
         if target_path.exists() && !args.force {
-            println!(
-                "[{}/{}] Skipping '{}' (already exists at {:?})",
-                i + 1,
-                total,
-                title,
-                target_path
-            );
+            progress.println(format!("  [skip] '{}' already exists", title));
             skipped_count += 1;
+            saved_files.push(target_path);
+            progress.inc(1);
             continue;
         }
 
-        println!("[{}/{}] Fetching '{}'...", i + 1, total, title);
         match client.fetch_page(title).await {
             Ok(page) => {
                 let json_data = serde_json::to_string_pretty(&page)?;
                 if let Err(e) = tokio::fs::write(&target_path, json_data).await {
-                    eprintln!("  Failed to save {:?}: {}", target_path, e);
+                    progress.println(format!("  [error] Failed to save {:?}: {}", target_path, e));
                     failed_count += 1;
                 } else {
-                    println!("  Saved to {:?}", target_path);
+                    progress.println(format!("  [saved] '{}' -> {:?}", title, target_path));
                     success_count += 1;
+                    saved_files.push(target_path);
                 }
             }
             Err(e) => {
-                eprintln!("  Failed to fetch '{}': {}", title, e);
+                progress.println(format!("  [error] Failed to fetch '{}': {}", title, e));
                 failed_count += 1;
             }
         }
+
+        progress.inc(1);
 
         if args.delay_ms > 0 && i + 1 < total {
             sleep(Duration::from_millis(args.delay_ms)).await;
         }
     }
+
+    progress.finish_with_message("Download complete");
 
     println!();
     println!(
@@ -132,16 +149,7 @@ pub async fn run_download(args: DownloadArgs) -> Result<()> {
         success_count, skipped_count, failed_count, total
     );
 
-    Ok(())
+    Ok(saved_files)
 }
 
-/// Sanitize filename for safe storage on all OS filesystems
-pub fn sanitize_filename(name: &str) -> String {
-    name.chars()
-        .map(|c| match c {
-            '/' | '\\' | ':' | '*' | '?' | '"' | '<' | '>' | '|' => '_',
-            ' ' => '_',
-            other => other,
-        })
-        .collect()
-}
+pub use wiki::sanitize_filename;
