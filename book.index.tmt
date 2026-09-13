@@ -1,0 +1,3 @@
+@index(doc.index)
+
+- ${filter(contains(path, "wikipedia/"), by(path))}
