@@ -13,12 +13,12 @@ pub struct SyncArgs {
     #[arg(short, long)]
     pub random: Option<usize>,
 
-    /// Category name to sync articles from
+    /// Category name(s) to sync articles from
     #[arg(short, long)]
-    pub category: Option<String>,
+    pub category: Vec<String>,
 
     /// Maximum articles when specifying a category
-    #[arg(short, long, default_value_t = 10)]
+    #[arg(short, long, default_value_t = 50)]
     pub limit: usize,
 
     /// Language code (e.g., "ja", "en")
@@ -48,6 +48,10 @@ pub struct SyncArgs {
     /// Automatically trigger tmtbook build after conversion
     #[arg(long, default_value_t = false)]
     pub build: bool,
+
+    /// Max concurrent conversion tasks (defaults to CPU thread count)
+    #[arg(short = 'j', long)]
+    pub concurrency: Option<usize>,
 }
 
 pub async fn run_sync(args: SyncArgs) -> Result<()> {
@@ -78,6 +82,7 @@ pub async fn run_sync(args: SyncArgs) -> Result<()> {
         title: args.title.clone(),
         force: args.force,
         validate: args.validate,
+        concurrency: args.concurrency,
     };
 
     crate::convert_cmd::run_convert(convert_args).await?;

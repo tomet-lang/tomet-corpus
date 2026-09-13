@@ -1,7 +1,11 @@
 use std::path::{Path, PathBuf};
+use std::sync::Arc;
 
 use anyhow::{Context, Result};
 use clap::Args;
+use indicatif::{ProgressBar, ProgressStyle};
+use tokio::sync::Semaphore;
+use tokio::task::JoinSet;
 use wiki::{sanitize_filename, WikiPage, WikiToTometConverter};
 
 #[derive(Args, Debug, Clone)]
@@ -25,6 +29,16 @@ pub struct ConvertArgs {
     /// Validate converted files using tomet check
     #[arg(long, default_value_t = true)]
     pub validate: bool,
+
+    /// Max concurrent conversion tasks (defaults to CPU thread count)
+    #[arg(short = 'j', long)]
+    pub concurrency: Option<usize>,
+}
+
+enum ConvertOutcome {
+    Converted(String),
+    Skipped(String),
+    Failed(PathBuf, String),
 }
 
 pub async fn run_convert(args: ConvertArgs) -> Result<()> {
@@ -62,45 +76,91 @@ pub async fn run_convert(args: ConvertArgs) -> Result<()> {
         return Ok(());
     }
 
+    let total = files_to_convert.len();
+    let concurrency = args
+        .concurrency
+        .unwrap_or_else(|| std::thread::available_parallelism().map(|n| n.get()).unwrap_or(4))
+        .max(1);
+
     println!(
-        "Converting {} article(s) from {:?} to {:?}",
-        files_to_convert.len(),
-        args.input_dir,
-        args.output_dir
+        "Converting {} article(s) from {:?} to {:?} (concurrency: {})",
+        total, args.input_dir, args.output_dir, concurrency
     );
 
-    let converter = WikiToTometConverter::new();
-    let mut success_count = 0;
-    let mut failed_count = 0;
+    let progress = ProgressBar::new(total as u64);
+    progress.set_style(
+        ProgressStyle::default_bar()
+            .template("{spinner:.green} [{elapsed_precise}] [{bar:30.cyan/blue}] {pos}/{len} ({percent}%) {msg}")
+            .unwrap()
+            .progress_chars("#>-"),
+    );
+
+    let converter = Arc::new(WikiToTometConverter::new());
+    let semaphore = Arc::new(Semaphore::new(concurrency));
+    let mut join_set = JoinSet::new();
 
     for input_path in files_to_convert {
-        let filename = input_path.file_stem().unwrap().to_string_lossy();
+        let filename = input_path.file_stem().unwrap().to_string_lossy().to_string();
         let target_path = args.output_dir.join(format!("{}.tmt", filename));
+        let force = args.force;
+        let conv = Arc::clone(&converter);
+        let sem = Arc::clone(&semaphore);
 
-        if target_path.exists() && !args.force {
-            println!("Skipping existing {:?}", target_path);
-            continue;
-        }
+        join_set.spawn(async move {
+            if target_path.exists() && !force {
+                return ConvertOutcome::Skipped(filename);
+            }
 
-        match process_file(&converter, &input_path, &target_path).await {
-            Ok(title) => {
-                println!("Converted '{}' -> {:?}", title, target_path);
+            let _permit = sem.acquire_owned().await.expect("semaphore closed");
+            match process_file(&conv, &input_path, &target_path).await {
+                Ok(title) => ConvertOutcome::Converted(title),
+                Err(e) => ConvertOutcome::Failed(input_path, e.to_string()),
+            }
+        });
+    }
+
+    let mut success_count = 0;
+    let mut skipped_count = 0;
+    let mut failed_articles: Vec<(PathBuf, String)> = Vec::new();
+
+    while let Some(res) = join_set.join_next().await {
+        match res {
+            Ok(ConvertOutcome::Converted(title)) => {
+                progress.println(format!("  [converted] {}", title));
                 success_count += 1;
             }
-            Err(e) => {
-                eprintln!("Failed to convert {:?}: {}", input_path, e);
-                failed_count += 1;
+            Ok(ConvertOutcome::Skipped(title)) => {
+                progress.println(format!("  [skipped] {}", title));
+                skipped_count += 1;
             }
+            Ok(ConvertOutcome::Failed(path, err)) => {
+                progress.println(format!("  [error] {:?}: {}", path.file_name().unwrap_or_default(), err));
+                failed_articles.push((path, err));
+            }
+            Err(join_err) => {
+                eprintln!("Task join error: {}", join_err);
+            }
+        }
+        progress.inc(1);
+    }
+
+    progress.finish_with_message("Conversion complete");
+
+    let failed_count = failed_articles.len();
+    println!();
+    println!(
+        "Conversion finished: {} succeeded, {} skipped, {} failed (Total: {})",
+        success_count, skipped_count, failed_count, total
+    );
+
+    if !failed_articles.is_empty() {
+        eprintln!("\nFailed conversions:");
+        for (path, err) in &failed_articles {
+            eprintln!("  - {:?}: {}", path, err);
         }
     }
 
-    println!();
-    println!(
-        "Conversion finished: {} succeeded, {} failed",
-        success_count, failed_count
-    );
-
-    if args.validate && success_count > 0 {
+    if args.validate && (success_count > 0 || (skipped_count > 0 && failed_count == 0)) {
         println!();
         println!("Checking tomet syntax for: {:?}", args.output_dir);
         wiki::validate_path(&args.output_dir)?;
