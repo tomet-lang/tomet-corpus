@@ -18,12 +18,12 @@ pub struct DownloadArgs {
     #[arg(short, long)]
     pub random: Option<usize>,
 
-    /// Category name to download articles from
+    /// Category name(s) to download articles from
     #[arg(short, long)]
-    pub category: Option<String>,
+    pub category: Vec<String>,
 
     /// Maximum articles to download when specifying a category
-    #[arg(short, long, default_value_t = 10)]
+    #[arg(short, long, default_value_t = 50)]
     pub limit: usize,
 
     /// Language code (e.g., "ja", "en")
@@ -57,10 +57,10 @@ pub async fn run_download(args: DownloadArgs) -> Result<Vec<PathBuf>> {
     let mut titles_to_fetch: Vec<String> = args.title.clone();
 
     // 1. Fetch category titles if requested
-    if let Some(category) = &args.category {
+    for category in &args.category {
         println!("Fetching category members for '{}'...", category);
         let cat_titles = client.fetch_category_titles(category, args.limit).await?;
-        println!("Found {} articles in category.", cat_titles.len());
+        println!("Found {} articles in category '{}'.", cat_titles.len(), category);
         titles_to_fetch.extend(cat_titles);
     }
 

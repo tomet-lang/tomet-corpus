@@ -111,7 +111,7 @@ impl MediaWikiClient {
         let url = format!(
             "{}?action=query&list=random&rnnamespace=0&rnlimit={}&format=json",
             self.endpoint.action_api_url(),
-            count.min(50)
+            count.min(500)
         );
 
         let resp = self
@@ -147,7 +147,7 @@ impl MediaWikiClient {
             "{}?action=query&list=categorymembers&cmtitle={}&cmlimit={}&cmnamespace=0&format=json",
             self.endpoint.action_api_url(),
             encoded_cat,
-            limit.min(50)
+            limit.min(500)
         );
 
         let resp = self
