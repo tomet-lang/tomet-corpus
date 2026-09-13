@@ -183,7 +183,7 @@ impl WikiToTometConverter {
                 }
                 ';' => {
                     let rest_trimmed = rest.trim();
-                    if let Some((term, def)) = rest_trimmed.split_once(':') {
+                    if let Some((term, def)) = split_definition_line(rest_trimmed) {
                         result_lines.push(format!("{}- **{}**: {}", indent, term.trim(), def.trim()));
                     } else {
                         result_lines.push(format!("{}- **{}**", indent, rest_trimmed));
@@ -449,7 +449,7 @@ fn handle_wiki_bracket_content(inner: &str, out: &mut String, categories: &mut V
     };
 
     let file_target = sanitize_filename(target_clean);
-    out.push_str(&format!("@link(\"./{}.tmt\")[{}]", file_target, label));
+    out.push_str(&format!("@link(ref:\"{}\")[{}]", file_target, label));
 }
 
 /// Process and resolve or strip MediaWiki templates (handles nested {{ ... }})
@@ -579,7 +579,7 @@ fn transform_template(tmpl: &str) -> Option<String> {
                     let (target, label) = clean_link_target(item);
                     if !target.is_empty() {
                         let sanitized = sanitize_filename(&target);
-                        out.push_str(&format!("- @link(\"./{}.tmt\")[{}]\n", sanitized, label));
+                        out.push_str(&format!("- @link(ref:\"{}\")[{}]\n", sanitized, label));
                     }
                 }
             }
@@ -592,7 +592,7 @@ fn transform_template(tmpl: &str) -> Option<String> {
                     let (target, label) = clean_link_target(item);
                     if !target.is_empty() {
                         let sanitized = sanitize_filename(&target);
-                        out.push_str(&format!("- @link(\"./{}.tmt\")[{}]\n", sanitized, label));
+                        out.push_str(&format!("- @link(ref:\"{}\")[{}]\n", sanitized, label));
                     }
                 }
             }
@@ -603,7 +603,7 @@ fn transform_template(tmpl: &str) -> Option<String> {
             if let Some(target) = parsed.positional.first() {
                 if !target.is_empty() {
                     let sanitized = sanitize_filename(target);
-                    return Some(format!("@link(\"./{}.tmt\")[{}]", sanitized, target));
+                    return Some(format!("@link(ref:\"{}\")[{}]", sanitized, target));
                 }
             }
             None
@@ -684,6 +684,34 @@ fn transform_template(tmpl: &str) -> Option<String> {
     }
 }
 
+/// Split a MediaWiki definition list line `; term : definition` by top-level `:`
+/// without breaking colons inside `@link(...)`, quotes `"..."`, brackets `[...]`, or braces `{...}`.
+fn split_definition_line(s: &str) -> Option<(&str, &str)> {
+    let mut paren_depth = 0;
+    let mut bracket_depth = 0;
+    let mut brace_depth = 0;
+    let mut quote = false;
+
+    for (byte_idx, c) in s.char_indices() {
+        match c {
+            '"' => quote = !quote,
+            '(' if !quote => paren_depth += 1,
+            ')' if !quote && paren_depth > 0 => paren_depth -= 1,
+            '[' if !quote => bracket_depth += 1,
+            ']' if !quote && bracket_depth > 0 => bracket_depth -= 1,
+            '{' if !quote => brace_depth += 1,
+            '}' if !quote && brace_depth > 0 => brace_depth -= 1,
+            ':' if !quote && paren_depth == 0 && bracket_depth == 0 && brace_depth == 0 => {
+                let term = &s[..byte_idx];
+                let def = &s[byte_idx + 1..];
+                return Some((term, def));
+            }
+            _ => {}
+        }
+    }
+    None
+}
+
 /// Convert MediaWiki tables `{| ... |}` into tomet `@table` syntax
 fn process_tables(input: &str) -> String {
     let mut out = String::with_capacity(input.len());
@@ -733,10 +761,12 @@ fn process_tables(input: &str) -> String {
             } else if trimmed.starts_with('!') {
                 // Header cell(s)
                 let content = trimmed.trim_start_matches('!').trim();
-                for cell in content.split("!!") {
-                    let cleaned = clean_table_cell(cell);
+                for cell in split_table_row_cells(content, true) {
+                    let cleaned = clean_table_cell(&cell);
                     if cleaned.is_empty() {
                         current_row.push(String::new());
+                    } else if cleaned.starts_with("**") && cleaned.ends_with("**") {
+                        current_row.push(cleaned);
                     } else {
                         current_row.push(format!("**{}**", cleaned));
                     }
@@ -744,8 +774,8 @@ fn process_tables(input: &str) -> String {
             } else if trimmed.starts_with('|') {
                 // Data cell(s)
                 let content = trimmed.trim_start_matches('|').trim();
-                for cell in content.split("||") {
-                    let cleaned = clean_table_cell(cell);
+                for cell in split_table_row_cells(content, false) {
+                    let cleaned = clean_table_cell(&cell);
                     current_row.push(cleaned);
                 }
             }
@@ -759,6 +789,64 @@ fn process_tables(input: &str) -> String {
     out
 }
 
+/// Split a table row line into individual cells using `||` (and `!!` for headers),
+/// while respecting brackets `[[...]]` and braces `{{...}}`.
+fn split_table_row_cells(content: &str, is_header: bool) -> Vec<String> {
+    let mut cells = Vec::new();
+    let mut current = String::new();
+    let chars: Vec<char> = content.chars().collect();
+    let len = chars.len();
+    let mut bracket_depth = 0;
+    let mut brace_depth = 0;
+    let mut i = 0;
+
+    while i < len {
+        let c = chars[i];
+        match c {
+            '[' => {
+                bracket_depth += 1;
+                current.push(c);
+                i += 1;
+            }
+            ']' => {
+                if bracket_depth > 0 {
+                    bracket_depth -= 1;
+                }
+                current.push(c);
+                i += 1;
+            }
+            '{' => {
+                brace_depth += 1;
+                current.push(c);
+                i += 1;
+            }
+            '}' => {
+                if brace_depth > 0 {
+                    brace_depth -= 1;
+                }
+                current.push(c);
+                i += 1;
+            }
+            '|' if bracket_depth == 0 && brace_depth == 0 && i + 1 < len && chars[i + 1] == '|' => {
+                cells.push(current.trim().to_string());
+                current.clear();
+                i += 2;
+            }
+            '!' if is_header && bracket_depth == 0 && brace_depth == 0 && i + 1 < len && chars[i + 1] == '!' => {
+                cells.push(current.trim().to_string());
+                current.clear();
+                i += 2;
+            }
+            _ => {
+                current.push(c);
+                i += 1;
+            }
+        }
+    }
+    cells.push(current.trim().to_string());
+    cells
+}
+
 /// Strip HTML/MediaWiki cell attributes like `style="..."|` or `rowspan="2"|`
 fn clean_table_cell(cell: &str) -> String {
     let trimmed = cell.trim();
@@ -769,8 +857,11 @@ fn clean_table_cell(cell: &str) -> String {
             || attr_trimmed.starts_with("rowspan=")
             || attr_trimmed.starts_with("colspan=")
             || attr_trimmed.starts_with("width=")
+            || attr_trimmed.starts_with("height=")
             || attr_trimmed.starts_with("align=")
-            || attr_trimmed.starts_with("valign="))
+            || attr_trimmed.starts_with("valign=")
+            || attr_trimmed.starts_with("scope=")
+            || attr_trimmed.starts_with("bgcolor="))
             && !attr_trimmed.contains("[[")
             && !attr_trimmed.contains("{{");
         if is_attr {
@@ -983,13 +1074,35 @@ mod tests {
     }
 
     #[test]
+    fn test_process_tables_header_with_double_pipe_and_attributes() {
+        let input = "{|\n|-\n!&nbsp;||colspan=\"3\"|[[セ・リーグ]]||colspan=\"3\"|[[パ・リーグ]]\n|-\n!タイトル||選手||成績\n|}";
+        let output = process_tables(input);
+        assert!(output.contains("|[**&nbsp;**][**[[セ・リーグ]]**][**[[パ・リーグ]]**]"));
+        assert!(output.contains("|[**タイトル**][**選手**][**成績**]"));
+    }
+
+    #[test]
     fn test_convert_wikitext_preserves_table_cell_continuity() {
         let converter = WikiToTometConverter::new();
         let input = "== 表 ==\n{|\n|-\n! 姓名\n| 韓忠\n|-\n! 時代\n| [[後漢]]時代\n|}";
         let output = converter.convert_wikitext(input);
         assert!(output.contains("|[**姓名**][韓忠]"));
-        assert!(output.contains("|[**時代**][@link(\"./後漢.tmt\")[後漢]時代]"));
+        assert!(output.contains("|[**時代**][@link(ref:\"後漢\")[後漢]時代]"));
         assert!(!output.contains("|[**姓名**] [韓忠]"));
+    }
+
+    #[test]
+    fn test_definition_list_with_ref_link() {
+        let converter = WikiToTometConverter::new();
+        let input = "; [[星雲賞]]\n: 第1回受賞";
+        let output = converter.convert_wikitext(input);
+        assert!(output.contains("- **@link(ref:\"星雲賞\")[星雲賞]**"));
+        assert!(!output.contains("- **@link(ref**:"));
+
+        let input_inline = "; [[星雲賞]] : 第1回受賞";
+        let output_inline = converter.convert_wikitext(input_inline);
+        assert!(output_inline.contains("- **@link(ref:\"星雲賞\")[星雲賞]**: 第1回受賞"));
+        assert!(!output_inline.contains("- **@link(ref**:"));
     }
 
     #[test]
