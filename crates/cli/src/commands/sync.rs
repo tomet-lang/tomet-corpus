@@ -76,7 +76,7 @@ pub async fn run_sync(args: SyncArgs) -> Result<()> {
 
     println!();
     println!("=== Step 2: Converting to tomet (.tmt) ===");
-    let convert_args = crate::convert_cmd::ConvertArgs {
+    let convert_args = super::convert::ConvertArgs {
         input_dir: args.raw_dir.clone(),
         output_dir: args.pages_dir.clone(),
         title: args.title.clone(),
@@ -85,7 +85,7 @@ pub async fn run_sync(args: SyncArgs) -> Result<()> {
         concurrency: args.concurrency,
     };
 
-    crate::convert_cmd::run_convert(convert_args).await?;
+    super::convert::run_convert(convert_args).await?;
 
     if args.build {
         println!();
