@@ -19,6 +19,9 @@ enum Commands {
     /// Wikipedia dataset operations
     Wiki(commands::wiki::WikiArgs),
 
+    /// Aozora Bunko dataset operations
+    Aozora(commands::aozora::AozoraArgs),
+
     /// Display dataset statistics (word count, categories, metadata distribution)
     Stats(commands::stats::StatsArgs),
 
@@ -38,6 +41,7 @@ async fn main() -> Result<()> {
 
     match cli.command {
         Commands::Wiki(args) => commands::wiki::run_wiki(args).await?,
+        Commands::Aozora(args) => commands::aozora::run_aozora(args).await?,
         Commands::Stats(args) => commands::stats::run_stats(&args)?,
         Commands::Check(args) => commands::check::run_check(&args)?,
         Commands::Build(args) => commands::build::run_build(args)?,

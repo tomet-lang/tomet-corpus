@@ -117,7 +117,11 @@ pub async fn run_download(args: DownloadArgs) -> Result<Vec<PathBuf>> {
         }
 
         match client.fetch_page(title).await {
-            Ok(page) => {
+            Ok(mut page) => {
+                if page.url.is_none() {
+                    let key = if page.key.is_empty() { &page.title } else { &page.key };
+                    page.url = Some(format!("{}/wiki/{}", client.endpoint().base_url(), key));
+                }
                 let json_data = serde_json::to_string_pretty(&page)?;
                 if let Err(e) = tokio::fs::write(&target_path, json_data).await {
                     progress.println(format!("  [error] Failed to save {:?}: {}", target_path, e));

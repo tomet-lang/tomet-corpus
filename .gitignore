@@ -5,6 +5,8 @@ dist/
 
 # Wikipedia data directory (raw dumps, cached API responses, and generated pages)
 /wikipedia
+# Aozora Bunko data directory (raw dumps, cached catalog, and generated pages)
+/aozora
 
 # IDE and OS files
 .DS_Store

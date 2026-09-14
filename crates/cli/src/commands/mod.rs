@@ -1,3 +1,4 @@
+pub mod aozora;
 pub mod build;
 pub mod check;
 pub mod convert;

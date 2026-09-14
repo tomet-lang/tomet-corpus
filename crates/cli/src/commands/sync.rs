@@ -95,7 +95,7 @@ pub async fn run_sync(args: SyncArgs) -> Result<()> {
             .context("Failed to load tmtbook.toml configuration")?;
         let out_dir = src_dir.join(&config.book.dest);
 
-        let report = tmtbook::build_book(&src_dir, &out_dir, &config)?;
+        let report = tmtbook::build_book(&src_dir, &out_dir, &config, false)?;
         if !report.failures.is_empty() {
             anyhow::bail!("{} document(s) failed during tmtbook build", report.failures.len());
         }

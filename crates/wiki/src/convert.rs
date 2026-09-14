@@ -83,6 +83,11 @@ impl WikiToTometConverter {
         if let Some(latest) = &page.latest {
             out.push_str(&format!("  timestamp: \"{}\",\n", latest.timestamp));
         }
+        let wiki_url = page.url.clone().unwrap_or_else(|| {
+            let key = if page.key.is_empty() { &page.title } else { &page.key };
+            format!("https://ja.wikipedia.org/wiki/{}", key)
+        });
+        out.push_str(&format!("  url.wiki: \"{}\",\n", escape_string(&wiki_url)));
         if !categories.is_empty() {
             out.push_str("  categories: [\n");
             for cat in &categories {
@@ -1128,8 +1133,10 @@ mod tests {
             content_model: Some("wikitext".to_string()),
             license: None,
             source: Some("{{神社\n| 名称 = テスト神社\n| 所在地 = [[東京都]][[千代田区]]\n| 創建 = 1900年\n}}\n本文です。".to_string()),
+            ..Default::default()
         };
         let output = converter.convert(&page);
+        assert!(output.contains("url.wiki: \"https://ja.wikipedia.org/wiki/テスト神社\","));
         assert!(output.contains("type: \"神社\","));
         assert!(output.contains("名称: \"テスト神社\","));
         assert!(output.contains("所在地: \"東京都千代田区\","));
@@ -1163,6 +1170,7 @@ mod tests {
             content_model: Some("wikitext".to_string()),
             license: None,
             source: Some("; 翻案・演出 \n: [[監督]]\n; 映像ソフト\n:* 通常版\n:** 限定版（付録付き）\n".to_string()),
+            ..Default::default()
         };
         let output = converter.convert(&page);
         assert!(output.contains("- **翻案・演出**"));
@@ -1183,6 +1191,7 @@ mod tests {
             content_model: Some("wikitext".to_string()),
             license: None,
             source: Some("国です。\n[[Category:アジアの国]]\n[[カテゴリ:島国]]\n".to_string()),
+            ..Default::default()
         };
         let output = converter.convert(&page);
         assert!(output.contains("categories: ["));
@@ -1191,6 +1200,22 @@ mod tests {
         assert!(!output.contains("[[Category:"));
         crate::validator::validate_tmt_string(&output)
             .expect("valid syntax with categories in meta");
+    }
+
+    #[test]
+    fn test_custom_page_url_in_meta() {
+        let converter = WikiToTometConverter::new();
+        let page = WikiPage {
+            id: 100,
+            key: "Rust".to_string(),
+            title: "Rust".to_string(),
+            url: Some("https://en.wikipedia.org/wiki/Rust_(programming_language)".to_string()),
+            ..Default::default()
+        };
+        let output = converter.convert(&page);
+        assert!(output.contains("url.wiki: \"https://en.wikipedia.org/wiki/Rust_(programming_language)\","));
+        crate::validator::validate_tmt_string(&output)
+            .expect("valid syntax with custom url in meta");
     }
 
     #[test]

@@ -1,3 +1,4 @@
 @index(doc.index)
 
+- ${filter(contains(path, "aozora/"), by(path))}
 - ${filter(contains(path, "wikipedia/"), by(path))}

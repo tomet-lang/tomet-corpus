@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub struct WikiPage {
     pub id: u64,
     #[serde(default)]
@@ -14,6 +14,8 @@ pub struct WikiPage {
     pub license: Option<WikiLicense>,
     #[serde(default)]
     pub source: Option<String>,
+    #[serde(default)]
+    pub url: Option<String>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
