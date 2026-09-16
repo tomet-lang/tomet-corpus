@@ -3,12 +3,14 @@
   mkShell,
   tomet,
   tmtbook,
+  twrit,
   ...
 }:
 mkShell rec {
   buildInputs = with pkgs; [
     tomet
     tmtbook
+    twrit
     pagefind
   ];
 

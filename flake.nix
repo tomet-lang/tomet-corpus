@@ -8,12 +8,13 @@
 
     #[ Tool ]
     tomet.url = "github:tomet-lang/tomet";
-    tmtbook = {
+    tomet-book = {
       url = "github:tomet-lang/tomet-book";
       inputs.tomet.follows = "tomet";
-      inputs.nixpkgs.follows = "nixpkgs";
-      inputs.flake-parts.follows = "flake-parts";
-      inputs.treefmt-nix.follows = "treefmt-nix";
+    };
+    twrit = {
+      url = "github:tomet-lang/tomet-writ";
+      inputs.tomet.follows = "tomet";
     };
   };
 
