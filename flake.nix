@@ -7,9 +7,9 @@
     treefmt-nix.url = "github:numtide/treefmt-nix";
 
     #[ Tool ]
-    tomet.url = "git+https://github.com/tomet-lang/tomet";
+    tomet.url = "github:tomet-lang/tomet";
     tmtbook = {
-      url = "git+https://github.com/tomet-lang/tomet-book";
+      url = "github:tomet-lang/tomet-book";
       inputs.tomet.follows = "tomet";
       inputs.nixpkgs.follows = "nixpkgs";
       inputs.flake-parts.follows = "flake-parts";
