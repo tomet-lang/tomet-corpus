@@ -26,7 +26,10 @@ pub struct ServeArgs {
 pub async fn run_serve(args: ServeArgs) -> Result<()> {
     let config = tmtbook::BookConfig::load_from_dir(&args.dir)
         .with_context(|| format!("failed to load config from {:?}", args.dir))?;
-    let src_dir = args.dir.canonicalize().context("failed to resolve source dir")?;
+    let src_dir = args
+        .dir
+        .canonicalize()
+        .context("failed to resolve source dir")?;
     let out_dir = args.dest.unwrap_or_else(|| src_dir.join(&config.book.dest));
 
     tmtbook::run_dev_server(src_dir, out_dir, config, args.host, args.port).await?;

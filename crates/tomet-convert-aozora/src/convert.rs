@@ -10,9 +10,8 @@ use tokio::task::JoinSet;
 
 use crate::model::AozoraBook;
 
-static RE_RUBY_PIPE: LazyLock<Regex> = LazyLock::new(|| {
-    Regex::new(r"[｜|]([^《\r\n]+)《([^》\r\n]+)》").unwrap()
-});
+static RE_RUBY_PIPE: LazyLock<Regex> =
+    LazyLock::new(|| Regex::new(r"[｜|]([^《\r\n]+)《([^》\r\n]+)》").unwrap());
 
 static RE_RUBY_BARE: LazyLock<Regex> = LazyLock::new(|| {
     Regex::new(r"([\u{4E00}-\u{9FFF}\u{3400}-\u{4DBF}\u{F900}-\u{FAFF}々〇〻\u{20000}-\u{2FA1F}]+)《([^》\r\n]+)》").unwrap()
@@ -24,17 +23,14 @@ static RE_GUIDE_BLOCK: LazyLock<Regex> = LazyLock::new(|| {
 });
 
 // Structural notes in Aozora text: ［＃改ページ］, ［＃地から１字上げ］, etc.
-static RE_PAGE_BREAK: LazyLock<Regex> = LazyLock::new(|| {
-    Regex::new(r"［＃(?:改ページ|改段)］").unwrap()
-});
+static RE_PAGE_BREAK: LazyLock<Regex> =
+    LazyLock::new(|| Regex::new(r"［＃(?:改ページ|改段)］").unwrap());
 
 static RE_INDENT_NOTE: LazyLock<Regex> = LazyLock::new(|| {
     Regex::new(r"［＃(?:(?:ここから|ここで)?[^］]*(?:字下げ|字上げ|罫囲み)[^］]*|改行)］").unwrap()
 });
 
-static RE_CONSECUTIVE_NEWLINES: LazyLock<Regex> = LazyLock::new(|| {
-    Regex::new(r"\n{3,}").unwrap()
-});
+static RE_CONSECUTIVE_NEWLINES: LazyLock<Regex> = LazyLock::new(|| Regex::new(r"\n{3,}").unwrap());
 
 pub struct AozoraToTometConverter;
 
@@ -84,7 +80,8 @@ impl AozoraToTometConverter {
         }
 
         // 3. Body transformation
-        let (body, bibliography) = self.split_and_clean_body(&book.content, &book.title, &book.author);
+        let (body, bibliography) =
+            self.split_and_clean_body(&book.content, &book.title, &book.author);
         let converted_body = self.convert_ruby(&body);
 
         out.push_str(&converted_body);
@@ -125,7 +122,12 @@ impl AozoraToTometConverter {
     }
 
     /// Split the raw text into main body and bibliography, and strip guide notes and titles
-    pub fn split_and_clean_body(&self, raw: &str, title: &str, author: &str) -> (String, Option<String>) {
+    pub fn split_and_clean_body(
+        &self,
+        raw: &str,
+        title: &str,
+        author: &str,
+    ) -> (String, Option<String>) {
         // Normalize CRLF to LF
         let text = raw.replace("\r\n", "\n").replace('\r', "\n");
 
@@ -133,13 +135,14 @@ impl AozoraToTometConverter {
         let text = RE_GUIDE_BLOCK.replace_all(&text, "");
 
         // Split bibliography (底本：...) at the end
-        let (body_part, bib_part) = if let Some(idx) = text.find("\n底本：").or_else(|| text.find("\n底本:")) {
-            let body = &text[..idx];
-            let bib = &text[idx + 1..];
-            (body, Some(bib.trim().to_string()))
-        } else {
-            (text.as_ref(), None)
-        };
+        let (body_part, bib_part) =
+            if let Some(idx) = text.find("\n底本：").or_else(|| text.find("\n底本:")) {
+                let body = &text[..idx];
+                let bib = &text[idx + 1..];
+                (body, Some(bib.trim().to_string()))
+            } else {
+                (text.as_ref(), None)
+            };
 
         // Clean layout notes: ［＃改ページ］, ［＃地から１字上げ］, etc.
         let body = RE_PAGE_BREAK.replace_all(body_part, "\n\n");
@@ -204,9 +207,9 @@ pub async fn run_convert(args: ConvertArgs) -> Result<()> {
     let mut files_to_convert: Vec<PathBuf> = Vec::new();
 
     if !args.title.is_empty() {
-        let mut entries = tokio::fs::read_dir(&args.input_dir).await.with_context(|| {
-            format!("failed to read input directory {:?}", args.input_dir)
-        })?;
+        let mut entries = tokio::fs::read_dir(&args.input_dir)
+            .await
+            .with_context(|| format!("failed to read input directory {:?}", args.input_dir))?;
 
         while let Some(entry) = entries.next_entry().await? {
             let path = entry.path();
@@ -221,9 +224,9 @@ pub async fn run_convert(args: ConvertArgs) -> Result<()> {
             }
         }
     } else {
-        let mut entries = tokio::fs::read_dir(&args.input_dir).await.with_context(|| {
-            format!("failed to read input directory {:?}", args.input_dir)
-        })?;
+        let mut entries = tokio::fs::read_dir(&args.input_dir)
+            .await
+            .with_context(|| format!("failed to read input directory {:?}", args.input_dir))?;
 
         while let Some(entry) = entries.next_entry().await? {
             let path = entry.path();
@@ -241,7 +244,11 @@ pub async fn run_convert(args: ConvertArgs) -> Result<()> {
     let total = files_to_convert.len();
     let concurrency = args
         .concurrency
-        .unwrap_or_else(|| std::thread::available_parallelism().map(|n| n.get()).unwrap_or(4))
+        .unwrap_or_else(|| {
+            std::thread::available_parallelism()
+                .map(|n| n.get())
+                .unwrap_or(4)
+        })
         .max(1);
 
     println!(
@@ -262,7 +269,11 @@ pub async fn run_convert(args: ConvertArgs) -> Result<()> {
     let mut join_set = JoinSet::new();
 
     for input_path in files_to_convert {
-        let filename = input_path.file_stem().unwrap().to_string_lossy().to_string();
+        let filename = input_path
+            .file_stem()
+            .unwrap()
+            .to_string_lossy()
+            .to_string();
         let target_path = args.output_dir.join(format!("{}.tmt", filename));
         let force = args.force;
         let conv = Arc::clone(&converter);
@@ -296,7 +307,11 @@ pub async fn run_convert(args: ConvertArgs) -> Result<()> {
                 skipped_count += 1;
             }
             Ok(ConvertOutcome::Failed(path, err)) => {
-                progress.println(format!("  [error] {:?}: {}", path.file_name().unwrap_or_default(), err));
+                progress.println(format!(
+                    "  [error] {:?}: {}",
+                    path.file_name().unwrap_or_default(),
+                    err
+                ));
                 failed_articles.push((path, err));
             }
             Err(join_err) => {
@@ -399,7 +414,9 @@ mod tests {
         assert!(output.contains("@meta{"));
         assert!(output.contains("title: \"走れメロス\","));
         assert!(output.contains("author: \"太宰治\","));
-        assert!(output.contains("url.wiki: \"https://www.aozora.gr.jp/cards/000035/card1567.html\","));
+        assert!(
+            output.contains("url.wiki: \"https://www.aozora.gr.jp/cards/000035/card1567.html\",")
+        );
         assert!(output.contains("# 走れメロス"));
         assert!(output.contains("## 太宰治"));
         assert!(output.contains("@ruby[邪智暴虐](rt:\"じゃちぼうぎゃく\")"));

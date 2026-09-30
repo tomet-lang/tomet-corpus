@@ -6,7 +6,7 @@ use clap::Args;
 use indicatif::{ProgressBar, ProgressStyle};
 use tokio::sync::Semaphore;
 use tokio::task::JoinSet;
-use wiki::{sanitize_filename, WikiPage, WikiToTometConverter};
+use tomet_wikitext::{WikiPage, WikiToTometConverter, sanitize_filename};
 
 #[derive(Args, Debug, Clone)]
 pub struct ConvertArgs {
@@ -59,9 +59,9 @@ pub async fn run_convert(args: ConvertArgs) -> Result<()> {
             }
         }
     } else {
-        let mut entries = tokio::fs::read_dir(&args.input_dir).await.with_context(|| {
-            format!("failed to read input directory {:?}", args.input_dir)
-        })?;
+        let mut entries = tokio::fs::read_dir(&args.input_dir)
+            .await
+            .with_context(|| format!("failed to read input directory {:?}", args.input_dir))?;
 
         while let Some(entry) = entries.next_entry().await? {
             let path = entry.path();
@@ -79,7 +79,11 @@ pub async fn run_convert(args: ConvertArgs) -> Result<()> {
     let total = files_to_convert.len();
     let concurrency = args
         .concurrency
-        .unwrap_or_else(|| std::thread::available_parallelism().map(|n| n.get()).unwrap_or(4))
+        .unwrap_or_else(|| {
+            std::thread::available_parallelism()
+                .map(|n| n.get())
+                .unwrap_or(4)
+        })
         .max(1);
 
     println!(
@@ -100,7 +104,11 @@ pub async fn run_convert(args: ConvertArgs) -> Result<()> {
     let mut join_set = JoinSet::new();
 
     for input_path in files_to_convert {
-        let filename = input_path.file_stem().unwrap().to_string_lossy().to_string();
+        let filename = input_path
+            .file_stem()
+            .unwrap()
+            .to_string_lossy()
+            .to_string();
         let target_path = args.output_dir.join(format!("{}.tmt", filename));
         let force = args.force;
         let conv = Arc::clone(&converter);
@@ -134,7 +142,11 @@ pub async fn run_convert(args: ConvertArgs) -> Result<()> {
                 skipped_count += 1;
             }
             Ok(ConvertOutcome::Failed(path, err)) => {
-                progress.println(format!("  [error] {:?}: {}", path.file_name().unwrap_or_default(), err));
+                progress.println(format!(
+                    "  [error] {:?}: {}",
+                    path.file_name().unwrap_or_default(),
+                    err
+                ));
                 failed_articles.push((path, err));
             }
             Err(join_err) => {
@@ -163,7 +175,7 @@ pub async fn run_convert(args: ConvertArgs) -> Result<()> {
     if args.validate && (success_count > 0 || (skipped_count > 0 && failed_count == 0)) {
         println!();
         println!("Checking tomet syntax for: {:?}", args.output_dir);
-        wiki::validate_path(&args.output_dir)?;
+        tomet_wikitext::validate_path(&args.output_dir)?;
         println!("Validation passed successfully!");
     }
 

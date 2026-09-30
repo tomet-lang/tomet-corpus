@@ -10,19 +10,19 @@ pub struct AozoraArgs {
 #[derive(Subcommand, Debug)]
 pub enum AozoraCommands {
     /// Download works from Aozora Bunko
-    Download(aozora::DownloadArgs),
+    Download(tomet_aozora::DownloadArgs),
 
     /// Convert downloaded raw Aozora Bunko JSON data to tomet (.tmt)
-    Convert(aozora::ConvertArgs),
+    Convert(tomet_aozora::ConvertArgs),
 }
 
 pub async fn run_aozora(args: AozoraArgs) -> Result<()> {
     match args.command {
         AozoraCommands::Download(a) => {
-            aozora::run_download(a).await?;
+            tomet_aozora::run_download(a).await?;
         }
         AozoraCommands::Convert(a) => {
-            aozora::run_convert(a).await?;
+            tomet_aozora::run_convert(a).await?;
         }
     }
     Ok(())

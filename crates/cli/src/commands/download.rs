@@ -1,1 +1,1 @@
-pub use downloader::{run_download, DownloadArgs};
+pub use downloader::{DownloadArgs, run_download};

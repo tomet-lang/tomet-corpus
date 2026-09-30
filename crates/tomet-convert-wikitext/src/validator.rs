@@ -2,7 +2,7 @@ use std::io::Write;
 use std::path::Path;
 use std::process::Command;
 
-use anyhow::{bail, Context, Result};
+use anyhow::{Context, Result, bail};
 
 /// Run tomet check on the specified path (file or directory)
 pub fn validate_path(path: &Path) -> Result<()> {
@@ -14,7 +14,9 @@ pub fn validate_path(path: &Path) -> Result<()> {
         .arg("check")
         .arg(path)
         .status()
-        .context("Failed to execute `tomet check`. Ensure `tomet` is installed and available in PATH.")?;
+        .context(
+            "Failed to execute `tomet check`. Ensure `tomet` is installed and available in PATH.",
+        )?;
 
     if !status.success() {
         bail!("Tomet validation failed for {:?}", path);
@@ -34,12 +36,7 @@ pub fn validate_tmt_file(path: &Path) -> Result<()> {
     if !output.status.success() {
         let stderr = String::from_utf8_lossy(&output.stderr);
         let stdout = String::from_utf8_lossy(&output.stdout);
-        bail!(
-            "Validation failed for {:?}:\n{}{}",
-            path,
-            stdout,
-            stderr
-        );
+        bail!("Validation failed for {:?}:\n{}{}", path, stdout, stderr);
     }
 
     Ok(())

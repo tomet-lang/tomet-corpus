@@ -21,7 +21,10 @@ pub struct BuildArgs {
 pub fn run_build(args: BuildArgs) -> Result<()> {
     let config = tmtbook::BookConfig::load_from_dir(&args.dir)
         .with_context(|| format!("failed to load config from {:?}", args.dir))?;
-    let src_dir = args.dir.canonicalize().context("failed to resolve source dir")?;
+    let src_dir = args
+        .dir
+        .canonicalize()
+        .context("failed to resolve source dir")?;
     let out_dir = args.dest.unwrap_or_else(|| src_dir.join(&config.book.dest));
 
     let report = tmtbook::build_book(&src_dir, &out_dir, &config, false)?;
@@ -29,7 +32,10 @@ pub fn run_build(args: BuildArgs) -> Result<()> {
         for failure in &report.failures {
             eprintln!("  {}: {}", failure.rel_path, failure.error);
         }
-        anyhow::bail!("{} document(s) failed to build (--strict)", report.failures.len());
+        anyhow::bail!(
+            "{} document(s) failed to build (--strict)",
+            report.failures.len()
+        );
     }
 
     Ok(())

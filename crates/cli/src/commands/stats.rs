@@ -31,8 +31,8 @@ pub fn run_stats(args: &StatsArgs) -> Result<()> {
     let mut type_counts: HashMap<String, usize> = HashMap::new();
 
     for file in &files {
-        let content = std::fs::read_to_string(file)
-            .with_context(|| format!("failed to read {:?}", file))?;
+        let content =
+            std::fs::read_to_string(file).with_context(|| format!("failed to read {:?}", file))?;
 
         total_lines += content.lines().count();
         total_chars += content.chars().count();
@@ -49,8 +49,14 @@ pub fn run_stats(args: &StatsArgs) -> Result<()> {
     println!("  Dataset Statistics: {:?}", args.path);
     println!("==================================================");
     println!("  Total Documents : {}", file_count);
-    println!("  Total Lines     : {} (avg {} lines/doc)", total_lines, avg_lines);
-    println!("  Total Characters: {} (avg {} chars/doc)", total_chars, avg_chars);
+    println!(
+        "  Total Lines     : {} (avg {} lines/doc)",
+        total_lines, avg_lines
+    );
+    println!(
+        "  Total Characters: {} (avg {} chars/doc)",
+        total_chars, avg_chars
+    );
     println!("  Total Size      : {:.2} KB", total_bytes as f64 / 1024.0);
     println!();
 
@@ -138,7 +144,10 @@ fn parse_meta_stats(
                     in_categories = false;
                     continue;
                 }
-                let cat = trimmed.trim_matches('"').trim_end_matches(',').trim_matches('"');
+                let cat = trimmed
+                    .trim_matches('"')
+                    .trim_end_matches(',')
+                    .trim_matches('"');
                 if !cat.is_empty() {
                     *category_counts.entry(cat.to_string()).or_insert(0) += 1;
                 }

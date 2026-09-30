@@ -1,7 +1,6 @@
 use serde::Deserialize;
 
-pub use wiki::{WikiLatestRevision, WikiLicense, WikiPage};
-
+pub use tomet_wikitext::{WikiLatestRevision, WikiLicense, WikiPage};
 
 #[derive(Debug, Deserialize)]
 pub struct ActionQueryResponse<T> {

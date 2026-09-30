@@ -6,6 +6,6 @@ pub mod model;
 
 pub use catalog::AozoraCatalog;
 pub use client::AozoraClient;
-pub use convert::{run_convert, AozoraToTometConverter, ConvertArgs};
-pub use download::{run_download, sanitize_aozora_filename, DownloadArgs};
+pub use convert::{AozoraToTometConverter, ConvertArgs, run_convert};
+pub use download::{DownloadArgs, run_download, sanitize_aozora_filename};
 pub use model::{AozoraBook, AozoraCatalogEntry};

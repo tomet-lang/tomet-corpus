@@ -60,7 +60,11 @@ pub async fn run_download(args: DownloadArgs) -> Result<Vec<PathBuf>> {
     for category in &args.category {
         println!("Fetching category members for '{}'...", category);
         let cat_titles = client.fetch_category_titles(category, args.limit).await?;
-        println!("Found {} articles in category '{}'.", cat_titles.len(), category);
+        println!(
+            "Found {} articles in category '{}'.",
+            cat_titles.len(),
+            category
+        );
         titles_to_fetch.extend(cat_titles);
     }
 
@@ -119,7 +123,11 @@ pub async fn run_download(args: DownloadArgs) -> Result<Vec<PathBuf>> {
         match client.fetch_page(title).await {
             Ok(mut page) => {
                 if page.url.is_none() {
-                    let key = if page.key.is_empty() { &page.title } else { &page.key };
+                    let key = if page.key.is_empty() {
+                        &page.title
+                    } else {
+                        &page.key
+                    };
                     page.url = Some(format!("{}/wiki/{}", client.endpoint().base_url(), key));
                 }
                 let json_data = serde_json::to_string_pretty(&page)?;
@@ -156,4 +164,4 @@ pub async fn run_download(args: DownloadArgs) -> Result<Vec<PathBuf>> {
     Ok(saved_files)
 }
 
-pub use wiki::sanitize_filename;
+pub use tomet_wikitext::sanitize_filename;

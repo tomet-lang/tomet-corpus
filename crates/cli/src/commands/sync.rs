@@ -97,7 +97,10 @@ pub async fn run_sync(args: SyncArgs) -> Result<()> {
 
         let report = tmtbook::build_book(&src_dir, &out_dir, &config, false)?;
         if !report.failures.is_empty() {
-            anyhow::bail!("{} document(s) failed during tmtbook build", report.failures.len());
+            anyhow::bail!(
+                "{} document(s) failed during tmtbook build",
+                report.failures.len()
+            );
         }
         println!("tmtbook build completed successfully!");
     }

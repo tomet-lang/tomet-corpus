@@ -17,13 +17,16 @@ flake-parts.lib.mkFlake { inherit inputs; } {
     {
       devShells.default = pkgs.callPackage ./dev.nix {
         inherit inputs;
-        tomet = inputs.tomet.packages.${pkgs.stdenv.hostPlatform.system}.default;
-        tmtbook = inputs.tomet-book.packages.${pkgs.stdenv.hostPlatform.system}.default;
-        twrit = inputs.twrit.packages.${pkgs.stdenv.hostPlatform.system}.default;
+        fenix = inputs.fenix.packages.${pkgs.stdenv.hostPlatform.system};
+
+        tomet = inputs.tomet.packages.${pkgs.stdenv.hostPlatform.system}.tomet;
+        tomet-lsp = inputs.tomet.packages.${pkgs.stdenv.hostPlatform.system}.tomet-lsp;
+        tmtbook = inputs.tomet-book.packages.${pkgs.stdenv.hostPlatform.system}.tmtbook;
+        twrit = inputs.twrit.packages.${pkgs.stdenv.hostPlatform.system}.twrit;
       };
 
       treefmt = import ./formatter.nix {
-        tomet = inputs.tomet.packages.${pkgs.stdenv.hostPlatform.system}.default;
+        tomet = inputs.tomet.packages.${pkgs.stdenv.hostPlatform.system}.tomet;
       };
     };
 }

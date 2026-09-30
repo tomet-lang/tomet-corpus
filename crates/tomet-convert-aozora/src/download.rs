@@ -61,12 +61,9 @@ pub async fn run_download(args: DownloadArgs) -> Result<Vec<PathBuf>> {
     let client = AozoraClient::new()?;
 
     // 1. Load or fetch master catalog
-    let catalog = AozoraCatalog::load_or_fetch(
-        client.http_client(),
-        &args.cache_dir,
-        args.refresh_catalog,
-    )
-    .await?;
+    let catalog =
+        AozoraCatalog::load_or_fetch(client.http_client(), &args.cache_dir, args.refresh_catalog)
+            .await?;
 
     // 2. Resolve entries to download
     let mut targets: Vec<&AozoraCatalogEntry> = Vec::new();
@@ -160,13 +157,19 @@ pub async fn run_download(args: DownloadArgs) -> Result<Vec<PathBuf>> {
                     progress.println(format!("  [error] Failed to save {:?}: {}", target_path, e));
                     failed_count += 1;
                 } else {
-                    progress.println(format!("  [saved] {} - {} -> {:?}", book.author, book.title, target_path));
+                    progress.println(format!(
+                        "  [saved] {} - {} -> {:?}",
+                        book.author, book.title, target_path
+                    ));
                     success_count += 1;
                     saved_files.push(target_path);
                 }
             }
             Err(e) => {
-                progress.println(format!("  [error] Failed to fetch '{}': {}", entry.title, e));
+                progress.println(format!(
+                    "  [error] Failed to fetch '{}': {}",
+                    entry.title, e
+                ));
                 failed_count += 1;
             }
         }
@@ -222,4 +225,3 @@ mod tests {
         );
     }
 }
-

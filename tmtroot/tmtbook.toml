@@ -1,0 +1,10 @@
+[book]
+title = "tomet-sandbox"
+lang = "ja"
+dest = "dist"
+
+[ui]
+rail_title = "sandobox"
+default_view = "book"
+
+[build]

@@ -53,7 +53,8 @@ impl WikiToTometConverter {
             re_math_tags: Regex::new(r"(?s)<math(?:\s+[^>]*)?>(.*?)</math>").unwrap(),
             re_chem_tags: Regex::new(r"(?s)<chem(?:\s+[^>]*)?>(.*?)</chem>").unwrap(),
             re_html_comments: Regex::new(r"(?s)<!--.*?-->").unwrap(),
-            re_html_tags: Regex::new(r"</?(?:ins|del|small|big|u|s|span|div|abbr|q)(?:\s+[^>]*)?>").unwrap(),
+            re_html_tags: Regex::new(r"</?(?:ins|del|small|big|u|s|span|div|abbr|q)(?:\s+[^>]*)?>")
+                .unwrap(),
             re_horizontal_rule: Regex::new(r"(?m)^-{4,}\s*$").unwrap(),
             re_empty_bold: Regex::new(r"\*{4,}").unwrap(),
             re_bold_inner_space: Regex::new(r"\*\*(\s*)([^\*\n]+?)(\s*)\*\*").unwrap(),
@@ -84,16 +85,20 @@ impl WikiToTometConverter {
             out.push_str(&format!("  timestamp: \"{}\",\n", latest.timestamp));
         }
         let wiki_url = page.url.clone().unwrap_or_else(|| {
-            let key = if page.key.is_empty() { &page.title } else { &page.key };
+            let key = if page.key.is_empty() {
+                &page.title
+            } else {
+                &page.key
+            };
             format!("https://ja.wikipedia.org/wiki/{}", key)
         });
         out.push_str(&format!("  url.wiki: \"{}\",\n", escape_string(&wiki_url)));
         if !categories.is_empty() {
-            out.push_str("  categories: [\n");
+            out.push_str("  categories: list(\n");
             for cat in &categories {
                 out.push_str(&format!("    \"{}\",\n", escape_string(cat)));
             }
-            out.push_str("  ],\n");
+            out.push_str("  ),\n");
         }
         for (k, v) in &infobox_fields {
             if let Ok(num) = v.parse::<i64>() {
@@ -181,7 +186,11 @@ impl WikiToTometConverter {
                 '#' => result_lines.push(format!("{}1. {}", indent, rest)),
                 ':' => {
                     if prefix.chars().all(|c| c == ':') {
-                        result_lines.push(format!("{}  {}", "  ".repeat(depth.saturating_sub(1)), rest));
+                        result_lines.push(format!(
+                            "{}  {}",
+                            "  ".repeat(depth.saturating_sub(1)),
+                            rest
+                        ));
                     } else {
                         result_lines.push(format!("{}- {}", indent, rest));
                     }
@@ -189,7 +198,12 @@ impl WikiToTometConverter {
                 ';' => {
                     let rest_trimmed = rest.trim();
                     if let Some((term, def)) = split_definition_line(rest_trimmed) {
-                        result_lines.push(format!("{}- **{}**: {}", indent, term.trim(), def.trim()));
+                        result_lines.push(format!(
+                            "{}- **{}**: {}",
+                            indent,
+                            term.trim(),
+                            def.trim()
+                        ));
                     } else {
                         result_lines.push(format!("{}- **{}**", indent, rest_trimmed));
                     }
@@ -218,7 +232,9 @@ impl WikiToTometConverter {
         let text = self.re_empty_bold.replace_all(&text, "");
 
         // Convert external links with quoted URL
-        let text = self.re_ext_link_text.replace_all(&text, "@link(\"$1\")[$2]");
+        let text = self
+            .re_ext_link_text
+            .replace_all(&text, "@link(\"$1\")[$2]");
         let text = self.re_ext_link_bare.replace_all(&text, "@link(\"$1\")");
 
         // Prevent adjacent bracket conflict (e.g. `[content](prose)` mistaken as `second (args) group`)
@@ -257,7 +273,11 @@ impl WikiToTometConverter {
                 if chars[ci] == '`' {
                     in_code = !in_code;
                     ci += 1;
-                } else if !in_code && ci + 1 < chars.len() && chars[ci] == '*' && chars[ci + 1] == '*' {
+                } else if !in_code
+                    && ci + 1 < chars.len()
+                    && chars[ci] == '*'
+                    && chars[ci + 1] == '*'
+                {
                     count += 1;
                     ci += 2;
                 } else {
@@ -281,7 +301,12 @@ impl WikiToTometConverter {
             let trimmed = line.trim();
 
             // Skip empty list markers
-            if trimmed == "-" || trimmed == "*" || trimmed == "1." || trimmed == "- **" || trimmed == "**" {
+            if trimmed == "-"
+                || trimmed == "*"
+                || trimmed == "1."
+                || trimmed == "- **"
+                || trimmed == "**"
+            {
                 continue;
             }
 
@@ -414,7 +439,9 @@ fn handle_wiki_bracket_content(inner: &str, out: &mut String, categories: &mut V
     let target = parts[0].trim();
 
     // 1. Categories: "Category:" or "カテゴリ:" (excluding ":Category:")
-    if (target.starts_with("Category:") || target.starts_with("カテゴリ:")) && !target.starts_with(':') {
+    if (target.starts_with("Category:") || target.starts_with("カテゴリ:"))
+        && !target.starts_with(':')
+    {
         let cat_name = if let Some(stripped) = target.strip_prefix("Category:") {
             stripped
         } else if let Some(stripped) = target.strip_prefix("カテゴリ:") {
@@ -613,8 +640,13 @@ fn transform_template(tmpl: &str) -> Option<String> {
             }
             None
         }
-        "official website" | "official" | "official site" | "公式サイト" | "公式ウェブサイト" => {
-            let url = parsed.named.get("url").copied().or_else(|| parsed.positional.first().copied());
+        "official website" | "official" | "official site" | "公式サイト" | "公式ウェブサイト" =>
+        {
+            let url = parsed
+                .named
+                .get("url")
+                .copied()
+                .or_else(|| parsed.positional.first().copied());
             if let Some(u) = url {
                 if !u.is_empty() {
                     return Some(format!("@link(\"{}\")[公式サイト]", u));
@@ -623,8 +655,17 @@ fn transform_template(tmpl: &str) -> Option<String> {
             None
         }
         "wayback" | "webarchive" => {
-            let url = parsed.named.get("url").copied().or_else(|| parsed.positional.first().copied());
-            let title = parsed.named.get("title").copied().or_else(|| parsed.positional.get(1).copied()).unwrap_or("アーカイブ");
+            let url = parsed
+                .named
+                .get("url")
+                .copied()
+                .or_else(|| parsed.positional.first().copied());
+            let title = parsed
+                .named
+                .get("title")
+                .copied()
+                .or_else(|| parsed.positional.get(1).copied())
+                .unwrap_or("アーカイブ");
             if let Some(u) = url {
                 if !u.is_empty() {
                     return Some(format!("@link(\"{}\")[{}]", u, title));
@@ -670,15 +711,18 @@ fn transform_template(tmpl: &str) -> Option<String> {
                 parsed.positional.first().map(|s| s.to_string())
             }
         }
-        "isbn" => {
-            parsed.positional.first().map(|code| format!("ISBN: {}", code))
-        }
-        "issn" => {
-            parsed.positional.first().map(|code| format!("ISSN: {}", code))
-        }
-        "doi" => {
-            parsed.positional.first().map(|code| format!("DOI: {}", code))
-        }
+        "isbn" => parsed
+            .positional
+            .first()
+            .map(|code| format!("ISBN: {}", code)),
+        "issn" => parsed
+            .positional
+            .first()
+            .map(|code| format!("ISSN: {}", code)),
+        "doi" => parsed
+            .positional
+            .first()
+            .map(|code| format!("DOI: {}", code)),
         "jpn" | "日本" => Some("日本".to_string()),
         "usa" | "アメリカ合衆国" => Some("アメリカ合衆国".to_string()),
         "デフォルトソート" | "normdaten" | "authority control" | "coord" => None,
@@ -837,7 +881,12 @@ fn split_table_row_cells(content: &str, is_header: bool) -> Vec<String> {
                 current.clear();
                 i += 2;
             }
-            '!' if is_header && bracket_depth == 0 && brace_depth == 0 && i + 1 < len && chars[i + 1] == '!' => {
+            '!' if is_header
+                && bracket_depth == 0
+                && brace_depth == 0
+                && i + 1 < len
+                && chars[i + 1] == '!' =>
+            {
                 cells.push(current.trim().to_string());
                 current.clear();
                 i += 2;
@@ -1025,7 +1074,10 @@ fn clean_meta_val(val: &str) -> String {
     let v = re_pair_ref.replace_all(&v, "");
     let v = re_br.replace_all(&v, ", ");
     let v = re_wiki.replace_all(&v, |caps: &Captures| {
-        caps.get(2).map(|m| m.as_str()).unwrap_or(&caps[1]).to_string()
+        caps.get(2)
+            .map(|m| m.as_str())
+            .unwrap_or(&caps[1])
+            .to_string()
     });
     let v = re_ext.replace_all(&v, "$1");
     let v = re_ext_bare.replace_all(&v, "");
@@ -1046,7 +1098,10 @@ fn clean_link_target(raw: &str) -> (String, String) {
     if let Some((target, label)) = unbracketed.split_once('|') {
         (target.trim().to_string(), label.trim().to_string())
     } else {
-        (unbracketed.trim().to_string(), unbracketed.trim().to_string())
+        (
+            unbracketed.trim().to_string(),
+            unbracketed.trim().to_string(),
+        )
     }
 }
 
@@ -1151,7 +1206,8 @@ mod tests {
     #[test]
     fn test_nested_file_brackets_removal() {
         let converter = WikiToTometConverter::new();
-        let input = "前文\n[[ファイル:King of Na gold seal.jpg|thumb|[[漢委奴国王印]]|代替文=]]\n後文。";
+        let input =
+            "前文\n[[ファイル:King of Na gold seal.jpg|thumb|[[漢委奴国王印]]|代替文=]]\n後文。";
         let output = converter.convert_wikitext(input);
         assert!(!output.contains("ファイル:"));
         assert!(!output.contains("漢委奴国王印"));
@@ -1169,7 +1225,10 @@ mod tests {
             latest: None,
             content_model: Some("wikitext".to_string()),
             license: None,
-            source: Some("; 翻案・演出 \n: [[監督]]\n; 映像ソフト\n:* 通常版\n:** 限定版（付録付き）\n".to_string()),
+            source: Some(
+                "; 翻案・演出 \n: [[監督]]\n; 映像ソフト\n:* 通常版\n:** 限定版（付録付き）\n"
+                    .to_string(),
+            ),
             ..Default::default()
         };
         let output = converter.convert(&page);
@@ -1194,7 +1253,7 @@ mod tests {
             ..Default::default()
         };
         let output = converter.convert(&page);
-        assert!(output.contains("categories: ["));
+        assert!(output.contains("categories: list("));
         assert!(output.contains("\"アジアの国\","));
         assert!(output.contains("\"島国\","));
         assert!(!output.contains("[[Category:"));
@@ -1213,7 +1272,11 @@ mod tests {
             ..Default::default()
         };
         let output = converter.convert(&page);
-        assert!(output.contains("url.wiki: \"https://en.wikipedia.org/wiki/Rust_(programming_language)\","));
+        assert!(
+            output.contains(
+                "url.wiki: \"https://en.wikipedia.org/wiki/Rust_(programming_language)\","
+            )
+        );
         crate::validator::validate_tmt_string(&output)
             .expect("valid syntax with custom url in meta");
     }

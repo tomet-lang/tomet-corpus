@@ -2,7 +2,7 @@ use std::fs::File;
 use std::io::{Cursor, Read};
 use std::path::Path;
 
-use anyhow::{bail, Context, Result};
+use anyhow::{Context, Result, bail};
 use reqwest::Client;
 use zip::ZipArchive;
 
@@ -29,18 +29,26 @@ impl AozoraCatalog {
         let cached_csv = cache_dir.join("list_person_all_extended_utf8.csv");
 
         if !cached_csv.exists() || force_refresh {
-            println!("Fetching Aozora Bunko catalog from {}...", AOZORA_CATALOG_ZIP_URL);
+            println!(
+                "Fetching Aozora Bunko catalog from {}...",
+                AOZORA_CATALOG_ZIP_URL
+            );
             let resp = client
                 .get(AOZORA_CATALOG_ZIP_URL)
                 .send()
                 .await
-                .with_context(|| format!("failed to request catalog from {}", AOZORA_CATALOG_ZIP_URL))?;
+                .with_context(|| {
+                    format!("failed to request catalog from {}", AOZORA_CATALOG_ZIP_URL)
+                })?;
 
             if !resp.status().is_success() {
                 bail!("failed to download catalog: HTTP {}", resp.status());
             }
 
-            let bytes = resp.bytes().await.context("failed to read catalog zip bytes")?;
+            let bytes = resp
+                .bytes()
+                .await
+                .context("failed to read catalog zip bytes")?;
 
             let mut zip = ZipArchive::new(Cursor::new(bytes))
                 .context("failed to parse catalog zip archive")?;
@@ -128,11 +136,7 @@ impl AozoraCatalog {
             }
         }
 
-        if !exact.is_empty() {
-            exact
-        } else {
-            partial
-        }
+        if !exact.is_empty() { exact } else { partial }
     }
 
     /// Find entries matching author name (partial or exact, supporting variant kanji like 龍/竜)
@@ -155,8 +159,11 @@ impl AozoraCatalog {
     pub fn find_random(&self, count: usize) -> Vec<&AozoraCatalogEntry> {
         use std::collections::HashSet;
 
-        let available: Vec<&AozoraCatalogEntry> =
-            self.entries.iter().filter(|e| e.has_text() && e.is_author()).collect();
+        let available: Vec<&AozoraCatalogEntry> = self
+            .entries
+            .iter()
+            .filter(|e| e.has_text() && e.is_author())
+            .collect();
 
         if available.is_empty() {
             return Vec::new();
@@ -178,13 +185,16 @@ impl AozoraCatalog {
         while chosen.len() < target_count && attempts < total * 2 {
             attempts += 1;
             // Linear congruential generator step
-            seed = seed.wrapping_mul(6364136223846793005).wrapping_add(1442695040888963407);
+            seed = seed
+                .wrapping_mul(6364136223846793005)
+                .wrapping_add(1442695040888963407);
             let idx = (seed >> 32) % total;
             let entry = available[idx];
 
             if let Some(id) = entry.id_u64()
-                && chosen_ids.insert(id) {
-                    chosen.push(entry);
+                && chosen_ids.insert(id)
+            {
+                chosen.push(entry);
             }
         }
 
@@ -233,4 +243,3 @@ mod tests {
         assert_eq!(random_picks.len(), 1);
     }
 }
-

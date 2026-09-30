@@ -1,8 +1,8 @@
 use std::io::{Cursor, Read};
 
-use anyhow::{bail, Context, Result};
-use reqwest::header::{HeaderMap, HeaderValue, USER_AGENT};
+use anyhow::{Context, Result, bail};
 use reqwest::Client;
+use reqwest::header::{HeaderMap, HeaderValue, USER_AGENT};
 use zip::ZipArchive;
 
 use crate::model::{AozoraBook, AozoraCatalogEntry};
@@ -79,7 +79,10 @@ impl AozoraClient {
         // Aozora Bunko text files are encoded in Shift_JIS (CP932)
         let (decoded, _encoding_used, had_errors) = encoding_rs::SHIFT_JIS.decode(&raw_bytes);
         if had_errors {
-            tracing::warn!("encountered encoding errors while decoding Shift_JIS for '{}'", entry.title);
+            tracing::warn!(
+                "encountered encoding errors while decoding Shift_JIS for '{}'",
+                entry.title
+            );
         }
 
         let id = entry.id_u64().unwrap_or(0);
@@ -88,19 +91,51 @@ impl AozoraClient {
         Ok(AozoraBook {
             id,
             title: entry.title.clone(),
-            title_yomi: if entry.title_yomi.is_empty() { None } else { Some(entry.title_yomi.clone()) },
-            subtitle: if entry.subtitle.is_empty() { None } else { Some(entry.subtitle.clone()) },
+            title_yomi: if entry.title_yomi.is_empty() {
+                None
+            } else {
+                Some(entry.title_yomi.clone())
+            },
+            subtitle: if entry.subtitle.is_empty() {
+                None
+            } else {
+                Some(entry.subtitle.clone())
+            },
             author: entry.author(),
-            author_yomi: if entry.author_yomi().is_empty() { None } else { Some(entry.author_yomi()) },
+            author_yomi: if entry.author_yomi().is_empty() {
+                None
+            } else {
+                Some(entry.author_yomi())
+            },
             person_id,
             url: entry.card_url.clone(),
-            release_date: if entry.release_date.is_empty() { None } else { Some(entry.release_date.clone()) },
-            last_modified: if entry.last_modified.is_empty() { None } else { Some(entry.last_modified.clone()) },
-            ndc: if entry.ndc.is_empty() { None } else { Some(entry.ndc.clone()) },
-            kana_type: if entry.kana_type.is_empty() { None } else { Some(entry.kana_type.clone()) },
+            release_date: if entry.release_date.is_empty() {
+                None
+            } else {
+                Some(entry.release_date.clone())
+            },
+            last_modified: if entry.last_modified.is_empty() {
+                None
+            } else {
+                Some(entry.last_modified.clone())
+            },
+            ndc: if entry.ndc.is_empty() {
+                None
+            } else {
+                Some(entry.ndc.clone())
+            },
+            kana_type: if entry.kana_type.is_empty() {
+                None
+            } else {
+                Some(entry.kana_type.clone())
+            },
             copyright: entry.copyright_flag == "あり",
             text_url: Some(entry.text_url.clone()),
-            html_url: if entry.html_url.is_empty() { None } else { Some(entry.html_url.clone()) },
+            html_url: if entry.html_url.is_empty() {
+                None
+            } else {
+                Some(entry.html_url.clone())
+            },
             content: decoded.into_owned(),
         })
     }

@@ -1,18 +1,19 @@
 [package]
-name = "downloader"
+name = "tomet-aozora"
 version.workspace = true
 edition.workspace = true
 
 [dependencies]
-tomet-wikitext = { workspace = true }
-
-#= Crates.io
 anyhow = { workspace = true }
 clap = { workspace = true }
+csv = { workspace = true }
+encoding_rs = { workspace = true }
 indicatif = { workspace = true }
+regex = { workspace = true }
 reqwest = { workspace = true }
 serde = { workspace = true }
 serde_json = { workspace = true }
 tokio = { workspace = true }
 tracing = { workspace = true }
 urlencoding = { workspace = true }
+zip = { workspace = true }

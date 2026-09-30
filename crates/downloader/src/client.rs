@@ -1,6 +1,6 @@
-use anyhow::{bail, Context, Result};
-use reqwest::header::{HeaderMap, HeaderValue, USER_AGENT};
+use anyhow::{Context, Result, bail};
 use reqwest::Client;
+use reqwest::header::{HeaderMap, HeaderValue, USER_AGENT};
 
 use super::model::{ActionQueryResponse, CategoryQueryResult, RandomQueryResult, WikiPage};
 
@@ -136,7 +136,8 @@ impl MediaWikiClient {
 
     /// Fetch article titles belonging to a category
     pub async fn fetch_category_titles(&self, category: &str, limit: usize) -> Result<Vec<String>> {
-        let cat_name = if category.starts_with("Category:") || category.starts_with("カテゴリ:") {
+        let cat_name = if category.starts_with("Category:") || category.starts_with("カテゴリ:")
+        {
             category.to_string()
         } else {
             format!("Category:{}", category)
