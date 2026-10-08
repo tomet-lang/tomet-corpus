@@ -26,6 +26,7 @@ mkShell rec {
     tmtbook
     twrit
     just
+    deno
     pagefind
 
     #= Build
