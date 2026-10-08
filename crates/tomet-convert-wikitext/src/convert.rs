@@ -109,8 +109,8 @@ impl WikiToTometConverter {
         }
         out.push_str("}\n\n");
 
-        // 2. Title as Markdown H1
-        out.push_str(&format!("# {}\n\n", page.title));
+        // 2. Title as Tomet H1
+        out.push_str(&format!("= {}\n\n", page.title));
 
         // 3. Body transformation
         if !converted_body.is_empty() {
@@ -213,12 +213,13 @@ impl WikiToTometConverter {
         }
         let text = result_lines.join("\n");
 
-        // Headings: == H2 == -> ## H2, etc.
-        let text = self.re_heading6.replace_all(&text, "###### $1");
-        let text = self.re_heading5.replace_all(&text, "##### $1");
-        let text = self.re_heading4.replace_all(&text, "#### $1");
-        let text = self.re_heading3.replace_all(&text, "### $1");
-        let text = self.re_heading2.replace_all(&text, "## $1");
+        // Headings: == H2 == -> == H2, etc.
+        let text = self.re_heading6.replace_all(&text, "====== $1");
+        let text = self.re_heading5.replace_all(&text, "===== $1");
+        let text = self.re_heading4.replace_all(&text, "==== $1");
+        let text = self.re_heading3.replace_all(&text, "=== $1");
+        let text = self.re_heading2.replace_all(&text, "== $1");
+
 
         // Convert bold and italic
         let text = self.re_bold_italic.replace_all(&text, "***$1***");
@@ -1170,12 +1171,13 @@ mod tests {
         let converter = WikiToTometConverter::new();
         let input = "== 祭神 ==\n* 祭神1<ref name=\"foo\"/>\n* 祭神2<ref name=\"foo\"/>\n== 歴史 ==\n歴史本文<ref name=\"bar\">文献</ref>。";
         let output = converter.convert_wikitext(input);
-        assert!(output.contains("## 祭神"));
+        assert!(output.contains("== 祭神"));
         assert!(output.contains("祭神1"));
         assert!(output.contains("祭神2"));
-        assert!(output.contains("## 歴史"));
+        assert!(output.contains("== 歴史"));
         assert!(output.contains("歴史本文"));
     }
+
 
     #[test]
     fn test_extract_infobox_to_meta() {

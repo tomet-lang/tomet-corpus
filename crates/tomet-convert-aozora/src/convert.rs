@@ -74,9 +74,9 @@ impl AozoraToTometConverter {
         out.push_str("}\n\n");
 
         // 2. Title and Author header
-        out.push_str(&format!("# {}\n\n", book.title));
+        out.push_str(&format!("= {}\n\n", book.title));
         if !book.author.is_empty() {
-            out.push_str(&format!("## {}\n\n", book.author));
+            out.push_str(&format!("== {}\n\n", book.author));
         }
 
         // 3. Body transformation
@@ -89,7 +89,7 @@ impl AozoraToTometConverter {
 
         // 4. Bibliography / footer if present
         if let Some(bib) = bibliography {
-            out.push_str("\n---\n\n### 底本情報\n\n");
+            out.push_str("\n---\n\n=== 底本情報\n\n");
             for line in bib.lines() {
                 let trimmed = line.trim();
                 if !trimmed.is_empty() {
@@ -98,6 +98,7 @@ impl AozoraToTometConverter {
                 }
             }
         }
+
 
         out
     }
@@ -417,10 +418,11 @@ mod tests {
         assert!(
             output.contains("url.wiki: \"https://www.aozora.gr.jp/cards/000035/card1567.html\",")
         );
-        assert!(output.contains("# 走れメロス"));
-        assert!(output.contains("## 太宰治"));
+        assert!(output.contains("= 走れメロス"));
+        assert!(output.contains("== 太宰治"));
         assert!(output.contains("@ruby[邪智暴虐](rt:\"じゃちぼうぎゃく\")"));
-        assert!(output.contains("### 底本情報"));
+        assert!(output.contains("=== 底本情報"));
         assert!(!output.contains("【テキスト中に現れる記号について】"));
     }
 }
+
