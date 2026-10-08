@@ -1,12 +1,7 @@
 [workspace]
 resolver = "3"
-members = [
-  "crates/cli",
-  "crates/downloader",
-  #= Converter
-  "crates/tomet-convert-aozora",
-  "crates/tomet-convert-wikitext",
-]
+members = ["app", "crates/*"]
+default-members = ["app"]
 
 [workspace.package]
 version = "0.1.0"

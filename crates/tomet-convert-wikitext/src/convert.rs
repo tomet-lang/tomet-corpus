@@ -220,7 +220,6 @@ impl WikiToTometConverter {
         let text = self.re_heading3.replace_all(&text, "=== $1");
         let text = self.re_heading2.replace_all(&text, "== $1");
 
-
         // Convert bold and italic
         let text = self.re_bold_italic.replace_all(&text, "***$1***");
         let text = self.re_bold.replace_all(&text, "**$1**");
@@ -429,7 +428,7 @@ fn clean_bracket_label(raw: &str) -> String {
             break;
         }
     }
-    s.replace('[', "").replace(']', "").trim().to_string()
+    s.replace(['[', ']'], "").trim().to_string()
 }
 
 fn handle_wiki_bracket_content(inner: &str, out: &mut String, categories: &mut Vec<String>) {
@@ -633,11 +632,11 @@ fn transform_template(tmpl: &str) -> Option<String> {
         }
         "仮リンク" => {
             // {{仮リンク|日本語記事名|言語コード|外国語記事名}}
-            if let Some(target) = parsed.positional.first() {
-                if !target.is_empty() {
-                    let sanitized = sanitize_filename(target);
-                    return Some(format!("@link(ref:\"{}\")[{}]", sanitized, target));
-                }
+            if let Some(target) = parsed.positional.first()
+                && !target.is_empty()
+            {
+                let sanitized = sanitize_filename(target);
+                return Some(format!("@link(ref:\"{}\")[{}]", sanitized, target));
             }
             None
         }
@@ -648,10 +647,10 @@ fn transform_template(tmpl: &str) -> Option<String> {
                 .get("url")
                 .copied()
                 .or_else(|| parsed.positional.first().copied());
-            if let Some(u) = url {
-                if !u.is_empty() {
-                    return Some(format!("@link(\"{}\")[公式サイト]", u));
-                }
+            if let Some(u) = url
+                && !u.is_empty()
+            {
+                return Some(format!("@link(\"{}\")[公式サイト]", u));
             }
             None
         }
@@ -667,28 +666,28 @@ fn transform_template(tmpl: &str) -> Option<String> {
                 .copied()
                 .or_else(|| parsed.positional.get(1).copied())
                 .unwrap_or("アーカイブ");
-            if let Some(u) = url {
-                if !u.is_empty() {
-                    return Some(format!("@link(\"{}\")[{}]", u, title));
-                }
+            if let Some(u) = url
+                && !u.is_empty()
+            {
+                return Some(format!("@link(\"{}\")[{}]", u, title));
             }
             None
         }
         "cite web" | "cite news" | "citation" => {
             let url = parsed.named.get("url").copied();
             let title = parsed.named.get("title").copied().unwrap_or("ウェブサイト");
-            if let Some(u) = url {
-                if !u.is_empty() {
-                    return Some(format!("@link(\"{}\")[{}]", u, title));
-                }
+            if let Some(u) = url
+                && !u.is_empty()
+            {
+                return Some(format!("@link(\"{}\")[{}]", u, title));
             }
             None
         }
         "url" => {
-            if let Some(u) = parsed.positional.first() {
-                if !u.is_empty() {
-                    return Some(format!("@link(\"{}\")[{}]", u, u));
-                }
+            if let Some(u) = parsed.positional.first()
+                && !u.is_empty()
+            {
+                return Some(format!("@link(\"{}\")[{}]", u, u));
             }
             None
         }
@@ -789,7 +788,7 @@ fn process_tables(input: &str) -> String {
             if !table_rows.is_empty() {
                 out.push_str("\n@table\n");
                 for row in &table_rows {
-                    out.push_str("|");
+                    out.push('|');
                     for cell in row {
                         let clean_cell = cell.trim().replace('\n', " ");
                         out.push_str(&format!("[{}]", clean_cell));
@@ -992,8 +991,8 @@ fn extract_infobox(text: &str) -> (Vec<(String, String)>, String) {
                 if is_infobox {
                     let mut fields = Vec::new();
                     // Clean type name
-                    let type_val = if clean_name.starts_with("基礎情報 ") {
-                        clean_name["基礎情報 ".len()..].trim().to_string()
+                    let type_val = if let Some(rest) = clean_name.strip_prefix("基礎情報 ") {
+                        rest.trim().to_string()
                     } else if clean_name.to_lowercase().starts_with("infobox ") {
                         clean_name[8..].trim().to_string()
                     } else {
@@ -1177,7 +1176,6 @@ mod tests {
         assert!(output.contains("== 歴史"));
         assert!(output.contains("歴史本文"));
     }
-
 
     #[test]
     fn test_extract_infobox_to_meta() {

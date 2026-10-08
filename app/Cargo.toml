@@ -1,7 +1,11 @@
 [package]
-name = "cli"
+name = "tomet-corpus-cli"
 version.workspace = true
 edition.workspace = true
+
+[[bin]]
+name = "tomet-corpus"
+path = "src/main.rs"
 
 [dependencies]
 downloader = { workspace = true }

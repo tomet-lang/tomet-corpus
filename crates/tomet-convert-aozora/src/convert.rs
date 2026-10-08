@@ -99,7 +99,6 @@ impl AozoraToTometConverter {
             }
         }
 
-
         out
     }
 
@@ -425,4 +424,3 @@ mod tests {
         assert!(!output.contains("【テキスト中に現れる記号について】"));
     }
 }
-
