@@ -1,10 +1,8 @@
 [book]
-title = "tomet-sandbox"
-lang = "ja"
+title = "Tomet Corpus docs"
+lang = "en"
 dest = "dist"
 
-[ui]
-rail_title = "sandobox"
-default_view = "book"
-
 [build]
+base = "/tomet-corpus"
+kinds = ["*", "!config", "!index"]

@@ -1,5 +1,49 @@
-- Wikipedia (ja)
-  - @link(https://dumps.wikimedia.org/jawiki/latest/)
-- Wiktionary
-- 青空文庫（Aozora Bunko / 文学作品）
-  - 青空文庫特有の「ルビ（ふりがな）」や「注記」を Tomet 構文にマッピング。
+@config(
+  export: {
+    type: commonmark,
+    path: "README.md"
+  }
+)
+@meta{
+  id: doc-readme,
+  lang: en
+}
+
+${macro.generated_by(self.path)}
+
+=[ Tomet Corpus ]
+
+Corpus conversion, benchmarking, and stress-testing toolchains for the Tomet ecosystem.
+
+==[ Overview ]
+
+`tomet-corpus` provides conversion toolchains that transform large-scale external text sources into valid Tomet (`.tmt`) documents. It serves as a real-world testing ground for syntax verification, parser performance benchmarking, and vocabulary validation.
+
+Supported corpus sources include:
+-| **Wikipedia**: MediaWiki / wikitext dumps conversion.
+-| **Wiktionary**: Dictionary and lexical data extraction.
+-| **Aozora Bunko**: Japanese literary works with ruby annotations and typesetting markers.
+
+==[ Workspace Layout ]
+
+-| @dir(app) -- CLI toolchain for sync, build, check, and stats.
+-| @dir(crates/tomet-convert-wikitext) -- Converts MediaWiki / wikitext to Tomet.
+-| @dir(crates/tomet-convert-aozora) -- Converts Aozora Bunko formatting to Tomet.
+-| @dir(crates/downloader) -- Fetches and caches remote corpora datasets.
+
+==[ Building and Running ]
+
+=== Build workspace
+```bash
+cargo build --workspace
+```
+
+=== Run tests
+```bash
+cargo test --workspace
+```
+
+=== Convert corpus
+```bash
+cargo run -p tomet-corpus-cli -- sync
+```
