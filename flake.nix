@@ -1,6 +1,11 @@
 {
   description = "Tomet Corpus - Conversion and corpus generation tools";
 
+  nixConfig = {
+    extra-substituters = [ "https://tomet.cachix.org" ];
+    extra-trusted-public-keys = [ "tomet.cachix.org-1:9c/iO8Tb6YOM+3r55t12W3fOJK+66itPEaIe8Rs9MDw=" ];
+  };
+
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
     flake-parts.url = "github:hercules-ci/flake-parts";
@@ -19,10 +24,7 @@
     };
 
     #= Tool
-    tomet = {
-      url = "github:tomet-lang/tomet";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
+    tomet.url = "github:tomet-lang/tomet";
     twrit = {
       url = "github:tomet-lang/tomet-writ";
       inputs.nixpkgs.follows = "nixpkgs";
