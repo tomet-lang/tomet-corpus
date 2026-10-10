@@ -45,6 +45,8 @@ All Markdown files (`README.md`, `AGENTS.md`, `CLAUDE.md`) are generated build a
 - `crates/downloader`: Fetches and caches remote corpora.
 - `app/`: CLI toolchain for sync, build, check, and stats.
 
+Read `CONTRIBUTING.md` for the contribution workflow, commit conventions, and verification steps.
+
 ## Environment & Tooling
 
 All commands, builds, and tests must run within the Nix development environment (via `direnv` or `nix develop`). Assume this environment is active and rely on the tools provided by the flake, rather than assuming or relying on global host toolchains.
@@ -79,8 +81,10 @@ When the task is done, fold anything worth keeping into where it belongs — a d
 The repository uses Jujutsu (`jj`) in colocated mode with Git.
 
 - Favor a branchless workflow. Do not create named Git branches for regular agent tasks.
-- All commit messages must follow the convention in `type(scope): description` (e.g. `feat(aozora): add ruby support`, `fix(wikitext): handle table syntax`).
+- All commit messages must follow the convention in `CONTRIBUTING.md`: `type(scope): description` (e.g. `feat(aozora): add ruby support`, `fix(wikitext): handle table syntax`).
 - Use `jj describe -m "..."` to set commit messages, and `jj new` to advance to subsequent revisions.
+- Always pass `--no-pager` to `jj` subcommands (e.g. `jj status --no-pager`, `jj log --no-pager`) — without it, output can hang waiting on a pager in non-interactive/agent sessions.
+- If `jj status`/`jj diff` shows changes you did not make, treat them as another person's in-progress work, not as drift to clean up. Always confirm with the user before reverting, restoring, or overwriting them.
 - Never commit automatically or on your own initiative. Always ask and get explicit confirmation from the user before finalizing commits or descriptions.
 - Do not put `Claude-Session:` or `Co-Authored-By: Claude` trailers in commit
 messages. The session trailer embeds a URL, and a commit message is
