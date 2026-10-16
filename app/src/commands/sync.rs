@@ -30,11 +30,11 @@ pub struct SyncArgs {
     pub host: String,
 
     /// Directory for raw downloaded JSON files
-    #[arg(long, default_value = "wikipedia/raw")]
+    #[arg(long, default_value = "data/wikipedia/raw")]
     pub raw_dir: PathBuf,
 
     /// Directory for converted .tmt files
-    #[arg(long, default_value = "wikipedia/pages")]
+    #[arg(long, default_value = "data/wikipedia/pages")]
     pub pages_dir: PathBuf,
 
     /// Overwrite existing downloaded/converted files

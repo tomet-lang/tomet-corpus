@@ -5,8 +5,9 @@
 # -----------------------------------------------------------------------
 
 #= Project-specific
-/wikipedia
-/aozora
+/data/wikipedia/
+/data/aozora/
+/data/examples/
 
 # -----------------------------------------------------------------------
 # Shared ignore rules

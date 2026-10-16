@@ -6,7 +6,7 @@ use clap::Args;
 #[derive(Args, Debug, Clone)]
 pub struct CheckArgs {
     /// Directory or file to check
-    #[arg(short, long, default_value = "wikipedia/pages")]
+    #[arg(short, long, default_value = "data/wikipedia/pages")]
     pub path: PathBuf,
 
     /// Suppress progress output

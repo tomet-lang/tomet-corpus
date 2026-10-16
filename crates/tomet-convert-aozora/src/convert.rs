@@ -173,11 +173,11 @@ fn escape_string(s: &str) -> String {
 #[derive(Args, Debug, Clone)]
 pub struct ConvertArgs {
     /// Directory containing raw downloaded JSON files
-    #[arg(short, long, default_value = "aozora/raw")]
+    #[arg(short, long, default_value = "data/aozora/raw")]
     pub input_dir: PathBuf,
 
     /// Output directory for .tmt files
-    #[arg(short, long, default_value = "aozora/pages")]
+    #[arg(short, long, default_value = "data/aozora/pages")]
     pub output_dir: PathBuf,
 
     /// Specific work title(s) to convert

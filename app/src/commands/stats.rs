@@ -7,7 +7,7 @@ use clap::Args;
 #[derive(Args, Debug, Clone)]
 pub struct StatsArgs {
     /// Directory containing .tmt files to analyze
-    #[arg(short, long, default_value = "wikipedia/pages")]
+    #[arg(short, long, default_value = "data/wikipedia/pages")]
     pub path: PathBuf,
 }
 

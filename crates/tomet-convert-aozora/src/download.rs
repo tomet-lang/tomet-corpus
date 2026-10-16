@@ -33,11 +33,11 @@ pub struct DownloadArgs {
     pub limit: usize,
 
     /// Output directory for raw downloaded JSON files
-    #[arg(short, long, default_value = "aozora/raw")]
+    #[arg(short, long, default_value = "data/aozora/raw")]
     pub output_dir: PathBuf,
 
     /// Directory to cache the Aozora Bunko master catalog CSV
-    #[arg(long, default_value = "aozora/cache")]
+    #[arg(long, default_value = "data/aozora/cache")]
     pub cache_dir: PathBuf,
 
     /// Force re-downloading the catalog CSV

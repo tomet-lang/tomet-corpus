@@ -35,7 +35,7 @@ pub struct DownloadArgs {
     pub host: String,
 
     /// Output directory for raw downloaded JSON files
-    #[arg(short, long, default_value = "wikipedia/raw")]
+    #[arg(short, long, default_value = "data/wikipedia/raw")]
     pub output_dir: PathBuf,
 
     /// Overwrite existing downloaded files

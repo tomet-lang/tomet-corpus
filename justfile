@@ -17,11 +17,15 @@ wiki-check:
 wiki-check-strict:
     cargo run -q -- wiki check && {{ tmtbook }} build --strict
 
-check target="wikipedia/pages":
+check target="data/wikipedia/pages":
     cargo run -q -- check -p {{ target }}
 
-stats target="wikipedia/pages":
+stats target="data/wikipedia/pages":
     cargo run -q -- stats -p {{ target }}
+
+# Fetch the example vaults (pkm, app-dev) into data/examples. Pin with: just examples --rev <commit>
+examples *args:
+    cargo run -q -- examples sync {{ args }}
 
 sync-random n="5":
     cargo run -q -- wiki sync --random {{ n }} --build

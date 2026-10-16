@@ -11,11 +11,11 @@ use tomet_wikitext::{WikiPage, WikiToTometConverter, sanitize_filename};
 #[derive(Args, Debug, Clone)]
 pub struct ConvertArgs {
     /// Directory containing raw downloaded JSON files
-    #[arg(short, long, default_value = "wikipedia/raw")]
+    #[arg(short, long, default_value = "data/wikipedia/raw")]
     pub input_dir: PathBuf,
 
     /// Output directory for .tmt files
-    #[arg(short, long, default_value = "wikipedia/pages")]
+    #[arg(short, long, default_value = "data/wikipedia/pages")]
     pub output_dir: PathBuf,
 
     /// Specific article title(s) to convert
