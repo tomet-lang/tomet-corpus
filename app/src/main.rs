@@ -22,6 +22,9 @@ enum Commands {
     /// Aozora Bunko dataset operations
     Aozora(commands::aozora::AozoraArgs),
 
+    /// Example vaults (pkm, app-dev) from the tomet-lang/examples repository
+    Examples(commands::examples::ExamplesArgs),
+
     /// Display dataset statistics (word count, categories, metadata distribution)
     Stats(commands::stats::StatsArgs),
 
@@ -42,6 +45,7 @@ async fn main() -> Result<()> {
     match cli.command {
         Commands::Wiki(args) => commands::wiki::run_wiki(args).await?,
         Commands::Aozora(args) => commands::aozora::run_aozora(args).await?,
+        Commands::Examples(args) => commands::examples::run_examples(args)?,
         Commands::Stats(args) => commands::stats::run_stats(&args)?,
         Commands::Check(args) => commands::check::run_check(&args)?,
         Commands::Build(args) => commands::build::run_build(args)?,

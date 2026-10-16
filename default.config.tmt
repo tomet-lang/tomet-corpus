@@ -24,6 +24,6 @@
     }
   }
   workspace: {
-    unswept: list( "tests/fixtures", "tests/ref", "tests/store" )
+    unswept: list( "tests/fixtures", "tests/ref", "tests/store", "data/examples" )
   }
 }
