@@ -2510,6 +2510,10 @@ dependencies = [
 ]
 
 [[package]]
+name = "tomet-synth"
+version = "0.1.0"
+
+[[package]]
 name = "tomet-transform"
 version = "0.1.0"
 source = "git+https://github.com/tomet-lang/tomet.git#f3dedb2c662736fccae62324fa0949f531e8a2e0"

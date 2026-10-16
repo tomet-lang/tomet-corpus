@@ -1,0 +1,10 @@
+[package]
+name = "tomet-synth"
+version.workspace = true
+edition.workspace = true
+description = "Deterministic synthetic Tomet (.tmt) corpus generator for benchmarks and stress tests"
+
+# Deliberately dependency-free: no `rand` (its streams are not stable across
+# versions) and no `tomet-*` crates (consumers depend on tomet, so depending on
+# it from here would be a cycle). The output is plain text.
+[dependencies]
