@@ -26,6 +26,7 @@ pub struct WikiToTometConverter {
     re_empty_bold: Regex,
     re_bold_inner_space: Regex,
     re_consecutive_newlines: Regex,
+    re_link_colon_name: Regex,
 }
 
 impl Default for WikiToTometConverter {
@@ -59,6 +60,10 @@ impl WikiToTometConverter {
             re_empty_bold: Regex::new(r"\*{4,}").unwrap(),
             re_bold_inner_space: Regex::new(r"\*\*(\s*)([^\*\n]+?)(\s*)\*\*").unwrap(),
             re_consecutive_newlines: Regex::new(r"\n{3,}").unwrap(),
+            re_link_colon_name: Regex::new(
+                r#"(@link\((?:ref:)?"[^"]*"\)\[[^\[\]]*\]):([ \t]*[A-Za-z_])"#,
+            )
+            .unwrap(),
         }
     }
 
@@ -324,6 +329,12 @@ impl WikiToTometConverter {
 
         // Normalize excessive blank lines
         let text = self.re_consecutive_newlines.replace_all(&text, "\n\n");
+
+        // `:name` right after an element is a connect in tomet (blanks after the
+        // colon are skipped, a name starts with an ASCII letter or `_`), and prose
+        // has no escape. A colon after a link and before such a name
+        // (`[[A]]:The Rose`) becomes a full-width one so it stays text.
+        let text = self.re_link_colon_name.replace_all(&text, "$1：$2");
 
         (text.trim().to_string(), categories)
     }
@@ -770,15 +781,18 @@ fn process_tables(input: &str) -> String {
 
     for line in input.lines() {
         let trimmed = line.trim();
+        // A table may open behind a list marker (`: {|`, `* {|`). Only the
+        // delimiters look past it; cell lines never carry one.
+        let delimiter = trimmed.trim_start_matches([':', '*', '#', ';', ' ']);
 
-        if trimmed.starts_with("{|") {
+        if delimiter.starts_with("{|") {
             in_table = true;
             table_rows.clear();
             current_row.clear();
             continue;
         }
 
-        if trimmed.starts_with("|}") {
+        if delimiter.starts_with("|}") {
             in_table = false;
             if !current_row.is_empty() {
                 table_rows.push(current_row.clone());
@@ -1139,6 +1153,30 @@ mod tests {
         let output = process_tables(input);
         assert!(output.contains("|[**&nbsp;**][**[[セ・リーグ]]**][**[[パ・リーグ]]**]"));
         assert!(output.contains("|[**タイトル**][**選手**][**成績**]"));
+    }
+
+    #[test]
+    fn test_process_tables_opened_behind_a_list_prefix() {
+        // A table may open on a definition-list line (`: {|`); it must still
+        // become an `@table`, not leak `{|` and `|-` into the list converter.
+        let converter = WikiToTometConverter::new();
+        let input = "; キャスト一覧\n: {| class=\"wikitable\"\n|-\n! 役名 !! 配役\n|-\n| タエ子 || 朝海ひかる\n|}";
+        let output = converter.convert_wikitext(input);
+        assert!(!output.contains("{|"), "{output}");
+        assert!(output.contains("@table"), "{output}");
+        assert!(output.contains("|[**役名**][**配役**]"), "{output}");
+        assert!(output.contains("|[タエ子][朝海ひかる]"), "{output}");
+    }
+
+    #[test]
+    fn test_colon_after_link_does_not_become_a_connect() {
+        let converter = WikiToTometConverter::new();
+        let output = converter.convert_wikitext("1. [[おもひでぽろぽろ]]:The Rose (6:23)");
+        assert!(output.contains(")[おもひでぽろぽろ]：The Rose"), "{output}");
+        // Digits, spaces and full-width text after the colon were never connects.
+        let output = converter.convert_wikitext("[[A]]:1 [[B]]: x [[C]]：y");
+        assert!(output.contains(")[A]:1"), "{output}");
+        assert!(output.contains(")[B]： x"), "{output}");
     }
 
     #[test]
