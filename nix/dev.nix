@@ -4,7 +4,7 @@
   fenix,
   tomet,
   tomet-lsp,
-  tmtbook,
+  tomet-shelf,
   twrit,
   ...
 }:
@@ -23,7 +23,7 @@ mkShell rec {
     #= Develop
     tomet
     tomet-lsp
-    tmtbook
+    tomet-shelf
     twrit
     just
     deno

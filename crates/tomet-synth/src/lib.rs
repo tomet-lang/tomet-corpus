@@ -5,7 +5,7 @@
 //!   platform and release. Documents are independent: `doc(i)` never replays
 //!   `0..i`, so a million-document corpus can be generated lazily or in
 //!   parallel.
-//! - Dependency-free, and it must stay that way: consumers (tomet, tomet-book,
+//! - Dependency-free, and it must stay that way: consumers (tomet, tomet-shelf,
 //!   immermemo) depend on this crate, so depending on any of them back would be
 //!   a cycle. The output is plain text; whether it parses is checked on the
 //!   consumer's side.

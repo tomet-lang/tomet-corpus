@@ -14,7 +14,7 @@ tomet-aozora = { path = "crates/tomet-convert-aozora" }
 tomet-wikitext = { path = "crates/tomet-convert-wikitext" }
 
 #= Tomet
-tmtbook = { git = "https://github.com/tomet-lang/tomet-book.git" }
+tomet-shelf = { git = "https://github.com/tomet-lang/tomet-shelf.git" }
 
 #= Crates.io
 anyhow = "1.0"

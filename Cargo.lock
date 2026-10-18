@@ -2138,115 +2138,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "fd3ca314f692efd6c868f8408f53fe444634a845f96c028b97d35f6a1f79f0ee"
 
 [[package]]
-name = "tmtbook"
-version = "0.1.0"
-source = "git+https://github.com/tomet-lang/tomet-book.git#1177a91707078c488ee7f56016c761fd7d146428"
-dependencies = [
- "anyhow",
- "image",
- "notify",
- "percent-encoding",
- "rayon",
- "regex",
- "serde",
- "serde_json",
- "tmtbook-assets",
- "tmtbook-config",
- "tmtbook-render",
- "tmtbook-search",
- "tmtbook-serve",
- "tokio",
- "tomet-ast",
- "tomet-compute",
- "tomet-html",
- "tomet-indexer",
- "tomet-links",
- "tomet-parser",
- "tomet-semantics",
- "tomet-transform",
- "tomet-tree",
- "toml",
- "tracing",
- "tracing-subscriber",
- "unicode-segmentation",
- "walkdir",
-]
-
-[[package]]
-name = "tmtbook-assets"
-version = "0.1.0"
-source = "git+https://github.com/tomet-lang/tomet-book.git#1177a91707078c488ee7f56016c761fd7d146428"
-dependencies = [
- "anyhow",
- "rayon",
- "serde",
- "serde_json",
- "tmtbook-config",
-]
-
-[[package]]
-name = "tmtbook-config"
-version = "0.1.0"
-source = "git+https://github.com/tomet-lang/tomet-book.git#1177a91707078c488ee7f56016c761fd7d146428"
-dependencies = [
- "anyhow",
- "serde",
- "toml",
-]
-
-[[package]]
-name = "tmtbook-render"
-version = "0.1.0"
-source = "git+https://github.com/tomet-lang/tomet-book.git#1177a91707078c488ee7f56016c761fd7d146428"
-dependencies = [
- "anyhow",
- "image",
- "minijinja",
- "percent-encoding",
- "regex",
- "serde",
- "serde_json",
- "tmtbook-assets",
- "tmtbook-config",
- "tmtbook-search",
- "tomet-ast",
- "tomet-compute",
- "tomet-html",
- "tomet-indexer",
- "tomet-links",
- "tomet-parser",
- "tomet-semantics",
- "tomet-transform",
- "tomet-tree",
- "tracing",
- "unicode-segmentation",
-]
-
-[[package]]
-name = "tmtbook-search"
-version = "0.1.0"
-source = "git+https://github.com/tomet-lang/tomet-book.git#1177a91707078c488ee7f56016c761fd7d146428"
-dependencies = [
- "serde",
- "serde_json",
-]
-
-[[package]]
-name = "tmtbook-serve"
-version = "0.1.0"
-source = "git+https://github.com/tomet-lang/tomet-book.git#1177a91707078c488ee7f56016c761fd7d146428"
-dependencies = [
- "anyhow",
- "axum",
- "notify",
- "serde",
- "serde_json",
- "tokio",
- "tower-http 0.5.2",
- "tracing",
-]
-
-[[package]]
 name = "tokio"
 version = "1.53.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2379,9 +2270,9 @@ dependencies = [
  "downloader",
  "indicatif",
  "serde_json",
- "tmtbook",
  "tokio",
  "tomet-aozora",
+ "tomet-shelf",
  "tomet-wikitext",
  "tracing",
  "tracing-subscriber",
@@ -2495,6 +2386,115 @@ dependencies = [
  "serde_json",
  "tomet-ast",
  "tomet-tree",
+]
+
+[[package]]
+name = "tomet-shelf"
+version = "0.1.0"
+source = "git+https://github.com/tomet-lang/tomet-shelf.git#4c8811bf2a9776b89ed2669c13457aa88c9627ec"
+dependencies = [
+ "anyhow",
+ "image",
+ "notify",
+ "percent-encoding",
+ "rayon",
+ "regex",
+ "serde",
+ "serde_json",
+ "tokio",
+ "tomet-ast",
+ "tomet-compute",
+ "tomet-html",
+ "tomet-indexer",
+ "tomet-links",
+ "tomet-parser",
+ "tomet-semantics",
+ "tomet-shelf-assets",
+ "tomet-shelf-config",
+ "tomet-shelf-render",
+ "tomet-shelf-search",
+ "tomet-shelf-serve",
+ "tomet-transform",
+ "tomet-tree",
+ "toml",
+ "tracing",
+ "tracing-subscriber",
+ "unicode-segmentation",
+ "walkdir",
+]
+
+[[package]]
+name = "tomet-shelf-assets"
+version = "0.1.0"
+source = "git+https://github.com/tomet-lang/tomet-shelf.git#4c8811bf2a9776b89ed2669c13457aa88c9627ec"
+dependencies = [
+ "anyhow",
+ "rayon",
+ "serde",
+ "serde_json",
+ "tomet-shelf-config",
+]
+
+[[package]]
+name = "tomet-shelf-config"
+version = "0.1.0"
+source = "git+https://github.com/tomet-lang/tomet-shelf.git#4c8811bf2a9776b89ed2669c13457aa88c9627ec"
+dependencies = [
+ "anyhow",
+ "serde",
+ "toml",
+]
+
+[[package]]
+name = "tomet-shelf-render"
+version = "0.1.0"
+source = "git+https://github.com/tomet-lang/tomet-shelf.git#4c8811bf2a9776b89ed2669c13457aa88c9627ec"
+dependencies = [
+ "anyhow",
+ "image",
+ "minijinja",
+ "percent-encoding",
+ "regex",
+ "serde",
+ "serde_json",
+ "tomet-ast",
+ "tomet-compute",
+ "tomet-html",
+ "tomet-indexer",
+ "tomet-links",
+ "tomet-parser",
+ "tomet-semantics",
+ "tomet-shelf-assets",
+ "tomet-shelf-config",
+ "tomet-shelf-search",
+ "tomet-transform",
+ "tomet-tree",
+ "tracing",
+ "unicode-segmentation",
+]
+
+[[package]]
+name = "tomet-shelf-search"
+version = "0.1.0"
+source = "git+https://github.com/tomet-lang/tomet-shelf.git#4c8811bf2a9776b89ed2669c13457aa88c9627ec"
+dependencies = [
+ "serde",
+ "serde_json",
+]
+
+[[package]]
+name = "tomet-shelf-serve"
+version = "0.1.0"
+source = "git+https://github.com/tomet-lang/tomet-shelf.git#4c8811bf2a9776b89ed2669c13457aa88c9627ec"
+dependencies = [
+ "anyhow",
+ "axum",
+ "notify",
+ "serde",
+ "serde_json",
+ "tokio",
+ "tower-http 0.5.2",
+ "tracing",
 ]
 
 [[package]]

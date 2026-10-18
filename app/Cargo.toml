@@ -13,7 +13,7 @@ tomet-aozora = { workspace = true }
 tomet-wikitext = { workspace = true }
 
 #= Tomet
-tmtbook = { workspace = true }
+tomet-shelf = { workspace = true }
 
 #= Crates.io
 anyhow = { workspace = true }

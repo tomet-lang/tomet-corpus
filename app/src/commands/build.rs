@@ -19,7 +19,7 @@ pub struct BuildArgs {
 }
 
 pub fn run_build(args: BuildArgs) -> Result<()> {
-    let config = tmtbook::BookConfig::load_from_dir(&args.dir)
+    let config = tomet_shelf::BookConfig::load_from_dir(&args.dir)
         .with_context(|| format!("failed to load config from {:?}", args.dir))?;
     let src_dir = args
         .dir
@@ -27,7 +27,7 @@ pub fn run_build(args: BuildArgs) -> Result<()> {
         .context("failed to resolve source dir")?;
     let out_dir = args.dest.unwrap_or_else(|| src_dir.join(&config.book.dest));
 
-    let report = tmtbook::build_book(&src_dir, &out_dir, &config, false)?;
+    let report = tomet_shelf::build_book(&src_dir, &out_dir, &config, false)?;
     if args.strict && !report.failures.is_empty() {
         for failure in &report.failures {
             eprintln!("  {}: {}", failure.rel_path, failure.error);

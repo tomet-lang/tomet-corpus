@@ -21,7 +21,7 @@ flake-parts.lib.mkFlake { inherit inputs; } {
 
         tomet = inputs.tomet.packages.${pkgs.stdenv.hostPlatform.system}.tomet;
         tomet-lsp = inputs.tomet.packages.${pkgs.stdenv.hostPlatform.system}.tomet-lsp;
-        tmtbook = inputs.tomet-book.packages.${pkgs.stdenv.hostPlatform.system}.tmtbook;
+        tomet-shelf = inputs.tomet-shelf.packages.${pkgs.stdenv.hostPlatform.system}.tomet-shelf;
         twrit = inputs.twrit.packages.${pkgs.stdenv.hostPlatform.system}.twrit;
       };
 

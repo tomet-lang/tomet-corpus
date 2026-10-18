@@ -2153,7 +2153,7 @@
     "fenix_38": {
       "inputs": {
         "nixpkgs": [
-          "tomet-book",
+          "tomet-shelf",
           "nixpkgs"
         ],
         "rust-analyzer-src": "rust-analyzer-src_38"
@@ -2175,7 +2175,7 @@
     "fenix_39": {
       "inputs": {
         "nixpkgs": [
-          "tomet-book",
+          "tomet-shelf",
           "tomet",
           "nixpkgs"
         ],
@@ -2222,7 +2222,7 @@
     "fenix_40": {
       "inputs": {
         "nixpkgs": [
-          "tomet-book",
+          "tomet-shelf",
           "tomet",
           "tomet-book",
           "nixpkgs"
@@ -2246,7 +2246,7 @@
     "fenix_41": {
       "inputs": {
         "nixpkgs": [
-          "tomet-book",
+          "tomet-shelf",
           "tomet",
           "tomet-book",
           "twrit",
@@ -2271,7 +2271,7 @@
     "fenix_42": {
       "inputs": {
         "nixpkgs": [
-          "tomet-book",
+          "tomet-shelf",
           "tomet",
           "tomet-book",
           "twrit",
@@ -2297,7 +2297,7 @@
     "fenix_43": {
       "inputs": {
         "nixpkgs": [
-          "tomet-book",
+          "tomet-shelf",
           "tomet",
           "tomet-book",
           "twrit",
@@ -2324,7 +2324,7 @@
     "fenix_44": {
       "inputs": {
         "nixpkgs": [
-          "tomet-book",
+          "tomet-shelf",
           "tomet",
           "tomet-book",
           "twrit",
@@ -2352,7 +2352,7 @@
     "fenix_45": {
       "inputs": {
         "nixpkgs": [
-          "tomet-book",
+          "tomet-shelf",
           "tomet",
           "twrit",
           "nixpkgs"
@@ -2376,7 +2376,7 @@
     "fenix_46": {
       "inputs": {
         "nixpkgs": [
-          "tomet-book",
+          "tomet-shelf",
           "tomet",
           "twrit",
           "tomet-book",
@@ -2401,7 +2401,7 @@
     "fenix_47": {
       "inputs": {
         "nixpkgs": [
-          "tomet-book",
+          "tomet-shelf",
           "twrit",
           "nixpkgs"
         ],
@@ -2424,7 +2424,7 @@
     "fenix_48": {
       "inputs": {
         "nixpkgs": [
-          "tomet-book",
+          "tomet-shelf",
           "twrit",
           "tomet",
           "nixpkgs"
@@ -2448,7 +2448,7 @@
     "fenix_49": {
       "inputs": {
         "nixpkgs": [
-          "tomet-book",
+          "tomet-shelf",
           "twrit",
           "tomet",
           "tomet-book",
@@ -2498,7 +2498,7 @@
     "fenix_50": {
       "inputs": {
         "nixpkgs": [
-          "tomet-book",
+          "tomet-shelf",
           "twrit",
           "tomet",
           "tomet-book",
@@ -2524,7 +2524,7 @@
     "fenix_51": {
       "inputs": {
         "nixpkgs": [
-          "tomet-book",
+          "tomet-shelf",
           "twrit",
           "tomet",
           "tomet-book",
@@ -2551,7 +2551,7 @@
     "fenix_52": {
       "inputs": {
         "nixpkgs": [
-          "tomet-book",
+          "tomet-shelf",
           "twrit",
           "tomet",
           "tomet-book",
@@ -2579,7 +2579,7 @@
     "fenix_53": {
       "inputs": {
         "nixpkgs": [
-          "tomet-book",
+          "tomet-shelf",
           "twrit",
           "tomet",
           "tomet-book",
@@ -2608,7 +2608,7 @@
     "fenix_54": {
       "inputs": {
         "nixpkgs": [
-          "tomet-book",
+          "tomet-shelf",
           "twrit",
           "tomet",
           "twrit",
@@ -2633,7 +2633,7 @@
     "fenix_55": {
       "inputs": {
         "nixpkgs": [
-          "tomet-book",
+          "tomet-shelf",
           "twrit",
           "tomet",
           "twrit",
@@ -2659,7 +2659,7 @@
     "fenix_56": {
       "inputs": {
         "nixpkgs": [
-          "tomet-book",
+          "tomet-shelf",
           "twrit",
           "tomet-book",
           "nixpkgs"
@@ -2683,7 +2683,7 @@
     "fenix_57": {
       "inputs": {
         "nixpkgs": [
-          "tomet-book",
+          "tomet-shelf",
           "twrit",
           "tomet-book",
           "tomet",
@@ -2708,7 +2708,7 @@
     "fenix_58": {
       "inputs": {
         "nixpkgs": [
-          "tomet-book",
+          "tomet-shelf",
           "twrit",
           "tomet-book",
           "tomet",
@@ -2734,7 +2734,7 @@
     "fenix_59": {
       "inputs": {
         "nixpkgs": [
-          "tomet-book",
+          "tomet-shelf",
           "twrit",
           "tomet-book",
           "tomet",
@@ -2787,7 +2787,7 @@
     "fenix_60": {
       "inputs": {
         "nixpkgs": [
-          "tomet-book",
+          "tomet-shelf",
           "twrit",
           "tomet-book",
           "tomet",
@@ -2815,7 +2815,7 @@
     "fenix_61": {
       "inputs": {
         "nixpkgs": [
-          "tomet-book",
+          "tomet-shelf",
           "twrit",
           "tomet-book",
           "tomet",
@@ -2844,7 +2844,7 @@
     "fenix_62": {
       "inputs": {
         "nixpkgs": [
-          "tomet-book",
+          "tomet-shelf",
           "twrit",
           "tomet-book",
           "tomet",
@@ -2874,7 +2874,7 @@
     "fenix_63": {
       "inputs": {
         "nixpkgs": [
-          "tomet-book",
+          "tomet-shelf",
           "twrit",
           "tomet-book",
           "tomet",
@@ -2900,7 +2900,7 @@
     "fenix_64": {
       "inputs": {
         "nixpkgs": [
-          "tomet-book",
+          "tomet-shelf",
           "twrit",
           "tomet-book",
           "tomet",
@@ -2927,7 +2927,7 @@
     "fenix_65": {
       "inputs": {
         "nixpkgs": [
-          "tomet-book",
+          "tomet-shelf",
           "twrit",
           "tomet-book",
           "twrit",
@@ -2952,7 +2952,7 @@
     "fenix_66": {
       "inputs": {
         "nixpkgs": [
-          "tomet-book",
+          "tomet-shelf",
           "twrit",
           "tomet-book",
           "twrit",
@@ -2978,7 +2978,7 @@
     "fenix_67": {
       "inputs": {
         "nixpkgs": [
-          "tomet-book",
+          "tomet-shelf",
           "twrit",
           "tomet-book",
           "twrit",
@@ -3005,7 +3005,7 @@
     "fenix_68": {
       "inputs": {
         "nixpkgs": [
-          "tomet-book",
+          "tomet-shelf",
           "twrit",
           "tomet-book",
           "twrit",
@@ -8282,7 +8282,7 @@
         "flake-parts": "flake-parts",
         "nixpkgs": "nixpkgs",
         "tomet": "tomet",
-        "tomet-book": "tomet-book_19",
+        "tomet-shelf": "tomet-shelf",
         "treefmt-nix": "treefmt-nix_68",
         "twrit": "twrit_27"
       }
@@ -10157,20 +10157,27 @@
     },
     "tomet-book_19": {
       "inputs": {
-        "crane": "crane_38",
-        "fenix": "fenix_38",
-        "flake-parts": "flake-parts_38",
-        "nixpkgs": "nixpkgs_43",
-        "tomet": "tomet_5",
-        "treefmt-nix": "treefmt-nix_45",
-        "twrit": "twrit_18"
+        "crane": "crane_40",
+        "fenix": "fenix_40",
+        "flake-parts": "flake-parts_40",
+        "nixpkgs": [
+          "tomet-shelf",
+          "tomet",
+          "nixpkgs"
+        ],
+        "tomet": [
+          "tomet-shelf",
+          "tomet"
+        ],
+        "treefmt-nix": "treefmt-nix_37",
+        "twrit": "twrit_15"
       },
       "locked": {
-        "lastModified": 1791733036,
-        "narHash": "sha256-H1GcnQb37J47Hr6XzEjKseJnyKmP5QVOdMc+HWl00hI=",
+        "lastModified": 1791427589,
+        "narHash": "sha256-GouqrosVe6k50YWUf2scjGSzHUEadKtfR0Mk8HhsshQ=",
         "owner": "tomet-lang",
         "repo": "tomet-book",
-        "rev": "1177a91707078c488ee7f56016c761fd7d146428",
+        "rev": "6c2ad41955f521f0da431c1581f438cf064fbeb1",
         "type": "github"
       },
       "original": {
@@ -10214,49 +10221,18 @@
     },
     "tomet-book_20": {
       "inputs": {
-        "crane": "crane_40",
-        "fenix": "fenix_40",
-        "flake-parts": "flake-parts_40",
-        "nixpkgs": [
-          "tomet-book",
-          "tomet",
-          "nixpkgs"
-        ],
-        "tomet": [
-          "tomet-book",
-          "tomet"
-        ],
-        "treefmt-nix": "treefmt-nix_37",
-        "twrit": "twrit_15"
-      },
-      "locked": {
-        "lastModified": 1791427589,
-        "narHash": "sha256-GouqrosVe6k50YWUf2scjGSzHUEadKtfR0Mk8HhsshQ=",
-        "owner": "tomet-lang",
-        "repo": "tomet-book",
-        "rev": "6c2ad41955f521f0da431c1581f438cf064fbeb1",
-        "type": "github"
-      },
-      "original": {
-        "owner": "tomet-lang",
-        "repo": "tomet-book",
-        "type": "github"
-      }
-    },
-    "tomet-book_21": {
-      "inputs": {
         "crane": "crane_42",
         "fenix": "fenix_42",
         "flake-parts": "flake-parts_42",
         "nixpkgs": [
-          "tomet-book",
+          "tomet-shelf",
           "tomet",
           "tomet-book",
           "twrit",
           "nixpkgs"
         ],
         "tomet": [
-          "tomet-book",
+          "tomet-shelf",
           "tomet",
           "tomet-book",
           "twrit",
@@ -10279,14 +10255,14 @@
         "type": "github"
       }
     },
-    "tomet-book_22": {
+    "tomet-book_21": {
       "inputs": {
         "crane": "crane_44",
         "fenix": "fenix_44",
         "flake-parts": "flake-parts_44",
         "nixpkgs": "nixpkgs_47",
         "tomet": [
-          "tomet-book",
+          "tomet-shelf",
           "tomet",
           "tomet-book",
           "twrit",
@@ -10310,14 +10286,14 @@
         "type": "github"
       }
     },
-    "tomet-book_23": {
+    "tomet-book_22": {
       "inputs": {
         "crane": "crane_46",
         "fenix": "fenix_46",
         "flake-parts": "flake-parts_46",
         "nixpkgs": "nixpkgs_50",
         "tomet": [
-          "tomet-book",
+          "tomet-shelf",
           "tomet",
           "twrit",
           "tomet"
@@ -10338,19 +10314,19 @@
         "type": "github"
       }
     },
-    "tomet-book_24": {
+    "tomet-book_23": {
       "inputs": {
         "crane": "crane_49",
         "fenix": "fenix_49",
         "flake-parts": "flake-parts_49",
         "nixpkgs": [
-          "tomet-book",
+          "tomet-shelf",
           "twrit",
           "tomet",
           "nixpkgs"
         ],
         "tomet": [
-          "tomet-book",
+          "tomet-shelf",
           "twrit",
           "tomet"
         ],
@@ -10371,13 +10347,13 @@
         "type": "github"
       }
     },
-    "tomet-book_25": {
+    "tomet-book_24": {
       "inputs": {
         "crane": "crane_51",
         "fenix": "fenix_51",
         "flake-parts": "flake-parts_51",
         "nixpkgs": [
-          "tomet-book",
+          "tomet-shelf",
           "twrit",
           "tomet",
           "tomet-book",
@@ -10385,7 +10361,7 @@
           "nixpkgs"
         ],
         "tomet": [
-          "tomet-book",
+          "tomet-shelf",
           "twrit",
           "tomet",
           "tomet-book",
@@ -10409,14 +10385,14 @@
         "type": "github"
       }
     },
-    "tomet-book_26": {
+    "tomet-book_25": {
       "inputs": {
         "crane": "crane_53",
         "fenix": "fenix_53",
         "flake-parts": "flake-parts_53",
         "nixpkgs": "nixpkgs_57",
         "tomet": [
-          "tomet-book",
+          "tomet-shelf",
           "twrit",
           "tomet",
           "tomet-book",
@@ -10441,14 +10417,14 @@
         "type": "github"
       }
     },
-    "tomet-book_27": {
+    "tomet-book_26": {
       "inputs": {
         "crane": "crane_55",
         "fenix": "fenix_55",
         "flake-parts": "flake-parts_55",
         "nixpkgs": "nixpkgs_60",
         "tomet": [
-          "tomet-book",
+          "tomet-shelf",
           "twrit",
           "tomet",
           "twrit",
@@ -10470,7 +10446,7 @@
         "type": "github"
       }
     },
-    "tomet-book_28": {
+    "tomet-book_27": {
       "inputs": {
         "crane": "crane_56",
         "fenix": "fenix_56",
@@ -10494,20 +10470,20 @@
         "type": "github"
       }
     },
-    "tomet-book_29": {
+    "tomet-book_28": {
       "inputs": {
         "crane": "crane_58",
         "fenix": "fenix_58",
         "flake-parts": "flake-parts_58",
         "nixpkgs": [
-          "tomet-book",
+          "tomet-shelf",
           "twrit",
           "tomet-book",
           "tomet",
           "nixpkgs"
         ],
         "tomet": [
-          "tomet-book",
+          "tomet-shelf",
           "twrit",
           "tomet-book",
           "tomet"
@@ -10521,6 +10497,46 @@
         "owner": "tomet-lang",
         "repo": "tomet-book",
         "rev": "6c2ad41955f521f0da431c1581f438cf064fbeb1",
+        "type": "github"
+      },
+      "original": {
+        "owner": "tomet-lang",
+        "repo": "tomet-book",
+        "type": "github"
+      }
+    },
+    "tomet-book_29": {
+      "inputs": {
+        "crane": "crane_60",
+        "fenix": "fenix_60",
+        "flake-parts": "flake-parts_60",
+        "nixpkgs": [
+          "tomet-shelf",
+          "twrit",
+          "tomet-book",
+          "tomet",
+          "tomet-book",
+          "twrit",
+          "nixpkgs"
+        ],
+        "tomet": [
+          "tomet-shelf",
+          "twrit",
+          "tomet-book",
+          "tomet",
+          "tomet-book",
+          "twrit",
+          "tomet"
+        ],
+        "treefmt-nix": "treefmt-nix_55",
+        "twrit": "twrit_23"
+      },
+      "locked": {
+        "lastModified": 1790171802,
+        "narHash": "sha256-4VMS41IhoIOFnuGkt49E15OuoShVU3WOGyFmkl+nKQI=",
+        "owner": "tomet-lang",
+        "repo": "tomet-book",
+        "rev": "d0efb0dc63ed7c76763cb5d476c10cb18e92890d",
         "type": "github"
       },
       "original": {
@@ -10569,52 +10585,12 @@
     },
     "tomet-book_30": {
       "inputs": {
-        "crane": "crane_60",
-        "fenix": "fenix_60",
-        "flake-parts": "flake-parts_60",
-        "nixpkgs": [
-          "tomet-book",
-          "twrit",
-          "tomet-book",
-          "tomet",
-          "tomet-book",
-          "twrit",
-          "nixpkgs"
-        ],
-        "tomet": [
-          "tomet-book",
-          "twrit",
-          "tomet-book",
-          "tomet",
-          "tomet-book",
-          "twrit",
-          "tomet"
-        ],
-        "treefmt-nix": "treefmt-nix_55",
-        "twrit": "twrit_23"
-      },
-      "locked": {
-        "lastModified": 1790171802,
-        "narHash": "sha256-4VMS41IhoIOFnuGkt49E15OuoShVU3WOGyFmkl+nKQI=",
-        "owner": "tomet-lang",
-        "repo": "tomet-book",
-        "rev": "d0efb0dc63ed7c76763cb5d476c10cb18e92890d",
-        "type": "github"
-      },
-      "original": {
-        "owner": "tomet-lang",
-        "repo": "tomet-book",
-        "type": "github"
-      }
-    },
-    "tomet-book_31": {
-      "inputs": {
         "crane": "crane_62",
         "fenix": "fenix_62",
         "flake-parts": "flake-parts_62",
         "nixpkgs": "nixpkgs_67",
         "tomet": [
-          "tomet-book",
+          "tomet-shelf",
           "twrit",
           "tomet-book",
           "tomet",
@@ -10640,14 +10616,14 @@
         "type": "github"
       }
     },
-    "tomet-book_32": {
+    "tomet-book_31": {
       "inputs": {
         "crane": "crane_64",
         "fenix": "fenix_64",
         "flake-parts": "flake-parts_64",
         "nixpkgs": "nixpkgs_70",
         "tomet": [
-          "tomet-book",
+          "tomet-shelf",
           "twrit",
           "tomet-book",
           "tomet",
@@ -10670,20 +10646,20 @@
         "type": "github"
       }
     },
-    "tomet-book_33": {
+    "tomet-book_32": {
       "inputs": {
         "crane": "crane_66",
         "fenix": "fenix_66",
         "flake-parts": "flake-parts_66",
         "nixpkgs": [
-          "tomet-book",
+          "tomet-shelf",
           "twrit",
           "tomet-book",
           "twrit",
           "nixpkgs"
         ],
         "tomet": [
-          "tomet-book",
+          "tomet-shelf",
           "twrit",
           "tomet-book",
           "twrit",
@@ -10706,14 +10682,14 @@
         "type": "github"
       }
     },
-    "tomet-book_34": {
+    "tomet-book_33": {
       "inputs": {
         "crane": "crane_68",
         "fenix": "fenix_68",
         "flake-parts": "flake-parts_68",
         "nixpkgs": "nixpkgs_75",
         "tomet": [
-          "tomet-book",
+          "tomet-shelf",
           "twrit",
           "tomet-book",
           "twrit",
@@ -10737,7 +10713,7 @@
         "type": "github"
       }
     },
-    "tomet-book_35": {
+    "tomet-book_34": {
       "inputs": {
         "crane": "crane_71",
         "fenix": "fenix_71",
@@ -10768,7 +10744,7 @@
         "type": "github"
       }
     },
-    "tomet-book_36": {
+    "tomet-book_35": {
       "inputs": {
         "crane": "crane_73",
         "fenix": "fenix_73",
@@ -10804,7 +10780,7 @@
         "type": "github"
       }
     },
-    "tomet-book_37": {
+    "tomet-book_36": {
       "inputs": {
         "crane": "crane_75",
         "fenix": "fenix_75",
@@ -10835,7 +10811,7 @@
         "type": "github"
       }
     },
-    "tomet-book_38": {
+    "tomet-book_37": {
       "inputs": {
         "crane": "crane_77",
         "fenix": "fenix_77",
@@ -10863,7 +10839,7 @@
         "type": "github"
       }
     },
-    "tomet-book_39": {
+    "tomet-book_38": {
       "inputs": {
         "crane": "crane_78",
         "fenix": "fenix_78",
@@ -10879,6 +10855,39 @@
         "owner": "tomet-lang",
         "repo": "tomet-book",
         "rev": "3126cc172ec1f58eefc4672f17ca687e4dcb8850",
+        "type": "github"
+      },
+      "original": {
+        "owner": "tomet-lang",
+        "repo": "tomet-book",
+        "type": "github"
+      }
+    },
+    "tomet-book_39": {
+      "inputs": {
+        "crane": "crane_80",
+        "fenix": "fenix_80",
+        "flake-parts": "flake-parts_80",
+        "nixpkgs": [
+          "twrit",
+          "tomet-book",
+          "tomet",
+          "nixpkgs"
+        ],
+        "tomet": [
+          "twrit",
+          "tomet-book",
+          "tomet"
+        ],
+        "treefmt-nix": "treefmt-nix_77",
+        "twrit": "twrit_31"
+      },
+      "locked": {
+        "lastModified": 1791427589,
+        "narHash": "sha256-GouqrosVe6k50YWUf2scjGSzHUEadKtfR0Mk8HhsshQ=",
+        "owner": "tomet-lang",
+        "repo": "tomet-book",
+        "rev": "6c2ad41955f521f0da431c1581f438cf064fbeb1",
         "type": "github"
       },
       "original": {
@@ -10921,39 +10930,6 @@
     },
     "tomet-book_40": {
       "inputs": {
-        "crane": "crane_80",
-        "fenix": "fenix_80",
-        "flake-parts": "flake-parts_80",
-        "nixpkgs": [
-          "twrit",
-          "tomet-book",
-          "tomet",
-          "nixpkgs"
-        ],
-        "tomet": [
-          "twrit",
-          "tomet-book",
-          "tomet"
-        ],
-        "treefmt-nix": "treefmt-nix_77",
-        "twrit": "twrit_31"
-      },
-      "locked": {
-        "lastModified": 1791427589,
-        "narHash": "sha256-GouqrosVe6k50YWUf2scjGSzHUEadKtfR0Mk8HhsshQ=",
-        "owner": "tomet-lang",
-        "repo": "tomet-book",
-        "rev": "6c2ad41955f521f0da431c1581f438cf064fbeb1",
-        "type": "github"
-      },
-      "original": {
-        "owner": "tomet-lang",
-        "repo": "tomet-book",
-        "type": "github"
-      }
-    },
-    "tomet-book_41": {
-      "inputs": {
         "crane": "crane_82",
         "fenix": "fenix_82",
         "flake-parts": "flake-parts_82",
@@ -10990,7 +10966,7 @@
         "type": "github"
       }
     },
-    "tomet-book_42": {
+    "tomet-book_41": {
       "inputs": {
         "crane": "crane_84",
         "fenix": "fenix_84",
@@ -11022,7 +10998,7 @@
         "type": "github"
       }
     },
-    "tomet-book_43": {
+    "tomet-book_42": {
       "inputs": {
         "crane": "crane_86",
         "fenix": "fenix_86",
@@ -11051,7 +11027,7 @@
         "type": "github"
       }
     },
-    "tomet-book_44": {
+    "tomet-book_43": {
       "inputs": {
         "crane": "crane_88",
         "fenix": "fenix_88",
@@ -11085,7 +11061,7 @@
         "type": "github"
       }
     },
-    "tomet-book_45": {
+    "tomet-book_44": {
       "inputs": {
         "crane": "crane_90",
         "fenix": "fenix_90",
@@ -11279,6 +11255,30 @@
         "type": "github"
       }
     },
+    "tomet-shelf": {
+      "inputs": {
+        "crane": "crane_38",
+        "fenix": "fenix_38",
+        "flake-parts": "flake-parts_38",
+        "nixpkgs": "nixpkgs_43",
+        "tomet": "tomet_5",
+        "treefmt-nix": "treefmt-nix_45",
+        "twrit": "twrit_18"
+      },
+      "locked": {
+        "lastModified": 1792328425,
+        "narHash": "sha256-ejHSgTjaMBsJwGxCh+6sqymC15bRC5zxJiMutExTa/k=",
+        "owner": "tomet-lang",
+        "repo": "tomet-shelf",
+        "rev": "4c8811bf2a9776b89ed2669c13457aa88c9627ec",
+        "type": "github"
+      },
+      "original": {
+        "owner": "tomet-lang",
+        "repo": "tomet-shelf",
+        "type": "github"
+      }
+    },
     "tomet_2": {
       "inputs": {
         "crane": "crane_4",
@@ -11357,7 +11357,7 @@
         "fenix": "fenix_39",
         "flake-parts": "flake-parts_39",
         "nixpkgs": "nixpkgs_44",
-        "tomet-book": "tomet-book_20",
+        "tomet-book": "tomet-book_19",
         "treefmt-nix": "treefmt-nix_42",
         "twrit": "twrit_17"
       },
@@ -11381,7 +11381,7 @@
         "fenix": "fenix_48",
         "flake-parts": "flake-parts_48",
         "nixpkgs": "nixpkgs_54",
-        "tomet-book": "tomet-book_24",
+        "tomet-book": "tomet-book_23",
         "treefmt-nix": "treefmt-nix_51",
         "twrit": "twrit_21"
       },
@@ -11405,7 +11405,7 @@
         "fenix": "fenix_57",
         "flake-parts": "flake-parts_57",
         "nixpkgs": "nixpkgs_64",
-        "tomet-book": "tomet-book_29",
+        "tomet-book": "tomet-book_28",
         "treefmt-nix": "treefmt-nix_59",
         "twrit": "twrit_24"
       },
@@ -11429,7 +11429,7 @@
         "fenix": "fenix_70",
         "flake-parts": "flake-parts_70",
         "nixpkgs": "nixpkgs_79",
-        "tomet-book": "tomet-book_35",
+        "tomet-book": "tomet-book_34",
         "treefmt-nix": "treefmt-nix_74",
         "twrit": "twrit_30"
       },
@@ -11453,7 +11453,7 @@
         "fenix": "fenix_79",
         "flake-parts": "flake-parts_79",
         "nixpkgs": "nixpkgs_89",
-        "tomet-book": "tomet-book_40",
+        "tomet-book": "tomet-book_39",
         "treefmt-nix": "treefmt-nix_82",
         "twrit": "twrit_33"
       },
@@ -12082,7 +12082,7 @@
     "treefmt-nix_37": {
       "inputs": {
         "nixpkgs": [
-          "tomet-book",
+          "tomet-shelf",
           "tomet",
           "tomet-book",
           "nixpkgs"
@@ -12177,7 +12177,7 @@
     "treefmt-nix_41": {
       "inputs": {
         "nixpkgs": [
-          "tomet-book",
+          "tomet-shelf",
           "tomet",
           "tomet-book",
           "twrit",
@@ -12201,7 +12201,7 @@
     "treefmt-nix_42": {
       "inputs": {
         "nixpkgs": [
-          "tomet-book",
+          "tomet-shelf",
           "tomet",
           "nixpkgs"
         ]
@@ -12259,7 +12259,7 @@
     "treefmt-nix_45": {
       "inputs": {
         "nixpkgs": [
-          "tomet-book",
+          "tomet-shelf",
           "nixpkgs"
         ]
       },
@@ -12280,7 +12280,7 @@
     "treefmt-nix_46": {
       "inputs": {
         "nixpkgs": [
-          "tomet-book",
+          "tomet-shelf",
           "twrit",
           "tomet",
           "tomet-book",
@@ -12383,7 +12383,7 @@
     "treefmt-nix_50": {
       "inputs": {
         "nixpkgs": [
-          "tomet-book",
+          "tomet-shelf",
           "twrit",
           "tomet",
           "tomet-book",
@@ -12408,7 +12408,7 @@
     "treefmt-nix_51": {
       "inputs": {
         "nixpkgs": [
-          "tomet-book",
+          "tomet-shelf",
           "twrit",
           "tomet",
           "nixpkgs"
@@ -12467,7 +12467,7 @@
     "treefmt-nix_54": {
       "inputs": {
         "nixpkgs": [
-          "tomet-book",
+          "tomet-shelf",
           "twrit",
           "tomet-book",
           "tomet",
@@ -12546,7 +12546,7 @@
     "treefmt-nix_58": {
       "inputs": {
         "nixpkgs": [
-          "tomet-book",
+          "tomet-shelf",
           "twrit",
           "tomet-book",
           "tomet",
@@ -12572,7 +12572,7 @@
     "treefmt-nix_59": {
       "inputs": {
         "nixpkgs": [
-          "tomet-book",
+          "tomet-shelf",
           "twrit",
           "tomet-book",
           "tomet",
@@ -12655,7 +12655,7 @@
     "treefmt-nix_62": {
       "inputs": {
         "nixpkgs": [
-          "tomet-book",
+          "tomet-shelf",
           "twrit",
           "tomet-book",
           "nixpkgs"
@@ -12732,7 +12732,7 @@
     "treefmt-nix_66": {
       "inputs": {
         "nixpkgs": [
-          "tomet-book",
+          "tomet-shelf",
           "twrit",
           "tomet-book",
           "twrit",
@@ -12756,7 +12756,7 @@
     "treefmt-nix_67": {
       "inputs": {
         "nixpkgs": [
-          "tomet-book",
+          "tomet-shelf",
           "twrit",
           "nixpkgs"
         ]
@@ -13507,18 +13507,18 @@
         "fenix": "fenix_41",
         "flake-parts": "flake-parts_41",
         "nixpkgs": [
-          "tomet-book",
+          "tomet-shelf",
           "tomet",
           "tomet-book",
           "nixpkgs"
         ],
         "tomet": [
-          "tomet-book",
+          "tomet-shelf",
           "tomet",
           "tomet-book",
           "tomet"
         ],
-        "tomet-book": "tomet-book_21",
+        "tomet-book": "tomet-book_20",
         "treefmt-nix": "treefmt-nix_41"
       },
       "locked": {
@@ -13542,14 +13542,14 @@
         "flake-parts": "flake-parts_43",
         "nixpkgs": "nixpkgs_46",
         "tomet": [
-          "tomet-book",
+          "tomet-shelf",
           "tomet",
           "tomet-book",
           "twrit",
           "tomet-book",
           "tomet"
         ],
-        "tomet-book": "tomet-book_22",
+        "tomet-book": "tomet-book_21",
         "treefmt-nix": "treefmt-nix_40"
       },
       "locked": {
@@ -13572,15 +13572,15 @@
         "fenix": "fenix_45",
         "flake-parts": "flake-parts_45",
         "nixpkgs": [
-          "tomet-book",
+          "tomet-shelf",
           "tomet",
           "nixpkgs"
         ],
         "tomet": [
-          "tomet-book",
+          "tomet-shelf",
           "tomet"
         ],
-        "tomet-book": "tomet-book_23",
+        "tomet-book": "tomet-book_22",
         "treefmt-nix": "treefmt-nix_44"
       },
       "locked": {
@@ -13604,7 +13604,7 @@
         "flake-parts": "flake-parts_47",
         "nixpkgs": "nixpkgs_53",
         "tomet": "tomet_6",
-        "tomet-book": "tomet-book_28",
+        "tomet-book": "tomet-book_27",
         "treefmt-nix": "treefmt-nix_67"
       },
       "locked": {
@@ -13627,20 +13627,20 @@
         "fenix": "fenix_50",
         "flake-parts": "flake-parts_50",
         "nixpkgs": [
-          "tomet-book",
+          "tomet-shelf",
           "twrit",
           "tomet",
           "tomet-book",
           "nixpkgs"
         ],
         "tomet": [
-          "tomet-book",
+          "tomet-shelf",
           "twrit",
           "tomet",
           "tomet-book",
           "tomet"
         ],
-        "tomet-book": "tomet-book_25",
+        "tomet-book": "tomet-book_24",
         "treefmt-nix": "treefmt-nix_50"
       },
       "locked": {
@@ -13696,7 +13696,7 @@
         "flake-parts": "flake-parts_52",
         "nixpkgs": "nixpkgs_56",
         "tomet": [
-          "tomet-book",
+          "tomet-shelf",
           "twrit",
           "tomet",
           "tomet-book",
@@ -13704,7 +13704,7 @@
           "tomet-book",
           "tomet"
         ],
-        "tomet-book": "tomet-book_26",
+        "tomet-book": "tomet-book_25",
         "treefmt-nix": "treefmt-nix_49"
       },
       "locked": {
@@ -13727,17 +13727,17 @@
         "fenix": "fenix_54",
         "flake-parts": "flake-parts_54",
         "nixpkgs": [
-          "tomet-book",
+          "tomet-shelf",
           "twrit",
           "tomet",
           "nixpkgs"
         ],
         "tomet": [
-          "tomet-book",
+          "tomet-shelf",
           "twrit",
           "tomet"
         ],
-        "tomet-book": "tomet-book_27",
+        "tomet-book": "tomet-book_26",
         "treefmt-nix": "treefmt-nix_53"
       },
       "locked": {
@@ -13760,7 +13760,7 @@
         "fenix": "fenix_59",
         "flake-parts": "flake-parts_59",
         "nixpkgs": [
-          "tomet-book",
+          "tomet-shelf",
           "twrit",
           "tomet-book",
           "tomet",
@@ -13768,14 +13768,14 @@
           "nixpkgs"
         ],
         "tomet": [
-          "tomet-book",
+          "tomet-shelf",
           "twrit",
           "tomet-book",
           "tomet",
           "tomet-book",
           "tomet"
         ],
-        "tomet-book": "tomet-book_30",
+        "tomet-book": "tomet-book_29",
         "treefmt-nix": "treefmt-nix_58"
       },
       "locked": {
@@ -13799,7 +13799,7 @@
         "flake-parts": "flake-parts_61",
         "nixpkgs": "nixpkgs_66",
         "tomet": [
-          "tomet-book",
+          "tomet-shelf",
           "twrit",
           "tomet-book",
           "tomet",
@@ -13808,7 +13808,7 @@
           "tomet-book",
           "tomet"
         ],
-        "tomet-book": "tomet-book_31",
+        "tomet-book": "tomet-book_30",
         "treefmt-nix": "treefmt-nix_57"
       },
       "locked": {
@@ -13831,19 +13831,19 @@
         "fenix": "fenix_63",
         "flake-parts": "flake-parts_63",
         "nixpkgs": [
-          "tomet-book",
+          "tomet-shelf",
           "twrit",
           "tomet-book",
           "tomet",
           "nixpkgs"
         ],
         "tomet": [
-          "tomet-book",
+          "tomet-shelf",
           "twrit",
           "tomet-book",
           "tomet"
         ],
-        "tomet-book": "tomet-book_32",
+        "tomet-book": "tomet-book_31",
         "treefmt-nix": "treefmt-nix_61"
       },
       "locked": {
@@ -13866,18 +13866,18 @@
         "fenix": "fenix_65",
         "flake-parts": "flake-parts_65",
         "nixpkgs": [
-          "tomet-book",
+          "tomet-shelf",
           "twrit",
           "tomet-book",
           "nixpkgs"
         ],
         "tomet": [
-          "tomet-book",
+          "tomet-shelf",
           "twrit",
           "tomet-book",
           "tomet"
         ],
-        "tomet-book": "tomet-book_33",
+        "tomet-book": "tomet-book_32",
         "treefmt-nix": "treefmt-nix_66"
       },
       "locked": {
@@ -13901,14 +13901,14 @@
         "flake-parts": "flake-parts_67",
         "nixpkgs": "nixpkgs_74",
         "tomet": [
-          "tomet-book",
+          "tomet-shelf",
           "twrit",
           "tomet-book",
           "twrit",
           "tomet-book",
           "tomet"
         ],
-        "tomet-book": "tomet-book_34",
+        "tomet-book": "tomet-book_33",
         "treefmt-nix": "treefmt-nix_65"
       },
       "locked": {
@@ -13932,7 +13932,7 @@
         "flake-parts": "flake-parts_69",
         "nixpkgs": "nixpkgs_78",
         "tomet": "tomet_8",
-        "tomet-book": "tomet-book_39",
+        "tomet-book": "tomet-book_38",
         "treefmt-nix": "treefmt-nix_90"
       },
       "locked": {
@@ -13966,7 +13966,7 @@
           "tomet-book",
           "tomet"
         ],
-        "tomet-book": "tomet-book_36",
+        "tomet-book": "tomet-book_35",
         "treefmt-nix": "treefmt-nix_73"
       },
       "locked": {
@@ -13997,7 +13997,7 @@
           "tomet-book",
           "tomet"
         ],
-        "tomet-book": "tomet-book_37",
+        "tomet-book": "tomet-book_36",
         "treefmt-nix": "treefmt-nix_72"
       },
       "locked": {
@@ -14061,7 +14061,7 @@
           "twrit",
           "tomet"
         ],
-        "tomet-book": "tomet-book_38",
+        "tomet-book": "tomet-book_37",
         "treefmt-nix": "treefmt-nix_76"
       },
       "locked": {
@@ -14097,7 +14097,7 @@
           "tomet-book",
           "tomet"
         ],
-        "tomet-book": "tomet-book_41",
+        "tomet-book": "tomet-book_40",
         "treefmt-nix": "treefmt-nix_81"
       },
       "locked": {
@@ -14129,7 +14129,7 @@
           "tomet-book",
           "tomet"
         ],
-        "tomet-book": "tomet-book_42",
+        "tomet-book": "tomet-book_41",
         "treefmt-nix": "treefmt-nix_80"
       },
       "locked": {
@@ -14162,7 +14162,7 @@
           "tomet-book",
           "tomet"
         ],
-        "tomet-book": "tomet-book_43",
+        "tomet-book": "tomet-book_42",
         "treefmt-nix": "treefmt-nix_84"
       },
       "locked": {
@@ -14194,7 +14194,7 @@
           "tomet-book",
           "tomet"
         ],
-        "tomet-book": "tomet-book_44",
+        "tomet-book": "tomet-book_43",
         "treefmt-nix": "treefmt-nix_89"
       },
       "locked": {
@@ -14224,7 +14224,7 @@
           "tomet-book",
           "tomet"
         ],
-        "tomet-book": "tomet-book_45",
+        "tomet-book": "tomet-book_44",
         "treefmt-nix": "treefmt-nix_88"
       },
       "locked": {

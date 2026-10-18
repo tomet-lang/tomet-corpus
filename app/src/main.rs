@@ -31,10 +31,10 @@ enum Commands {
     /// Check tomet (.tmt) syntax for a file or directory
     Check(commands::check::CheckArgs),
 
-    /// Build the book into static HTML with tmtbook
+    /// Build the book into static HTML with tomet-shelf
     Build(commands::build::BuildArgs),
 
-    /// Run local development preview server with tmtbook
+    /// Run local development preview server with tomet-shelf
     Serve(commands::serve::ServeArgs),
 }
 

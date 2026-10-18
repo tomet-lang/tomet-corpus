@@ -1,21 +1,21 @@
 set shell := ["bash", "-cu"]
 
-tmtbook := env_var_or_default("TMTBOOK", "tmtbook")
+shelf := env_var_or_default("TOMET_SHELF", "tomet-shelf")
 
 tree_out:
     tree -d -L 3
 
 wiki-build:
-    {{ tmtbook }} build
+    {{ shelf }} build
 
 wiki-dev:
-    {{ tmtbook }} serve
+    {{ shelf }} serve
 
 wiki-check:
     cargo run -q -- wiki check
 
 wiki-check-strict:
-    cargo run -q -- wiki check && {{ tmtbook }} build --strict
+    cargo run -q -- wiki check && {{ shelf }} build --strict
 
 check target="data/wikipedia/pages":
     cargo run -q -- check -p {{ target }}

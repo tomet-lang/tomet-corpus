@@ -26,7 +26,7 @@
     #= Tool
     tomet.url = "github:tomet-lang/tomet";
     twrit.url = "github:tomet-lang/tomet-writ";
-    tomet-book.url = "github:tomet-lang/tomet-book";
+    tomet-shelf.url = "github:tomet-lang/tomet-shelf";
   };
 
   outputs = inputs: import ./nix inputs;

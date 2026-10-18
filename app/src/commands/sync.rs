@@ -45,7 +45,7 @@ pub struct SyncArgs {
     #[arg(long, default_value_t = true)]
     pub validate: bool,
 
-    /// Automatically trigger tmtbook build after conversion
+    /// Automatically trigger tomet-shelf build after conversion
     #[arg(long, default_value_t = false)]
     pub build: bool,
 
@@ -89,20 +89,20 @@ pub async fn run_sync(args: SyncArgs) -> Result<()> {
 
     if args.build {
         println!();
-        println!("=== Step 3: Building book with tmtbook ===");
+        println!("=== Step 3: Building book with tomet-shelf ===");
         let src_dir = std::env::current_dir()?;
-        let config = tmtbook::BookConfig::load_from_dir(&src_dir)
-            .context("Failed to load tmtbook.toml configuration")?;
+        let config = tomet_shelf::BookConfig::load_from_dir(&src_dir)
+            .context("Failed to load shelf.toml configuration")?;
         let out_dir = src_dir.join(&config.book.dest);
 
-        let report = tmtbook::build_book(&src_dir, &out_dir, &config, false)?;
+        let report = tomet_shelf::build_book(&src_dir, &out_dir, &config, false)?;
         if !report.failures.is_empty() {
             anyhow::bail!(
-                "{} document(s) failed during tmtbook build",
+                "{} document(s) failed during tomet-shelf build",
                 report.failures.len()
             );
         }
-        println!("tmtbook build completed successfully!");
+        println!("tomet-shelf build completed successfully!");
     }
 
     println!();
