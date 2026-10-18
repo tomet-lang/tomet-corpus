@@ -2,10 +2,7 @@
   pkgs,
   mkShell,
   fenix,
-  tomet,
-  tomet-lsp,
-  tomet-shelf,
-  twrit,
+  tools,
   ...
 }:
 let
@@ -21,10 +18,7 @@ in
 mkShell rec {
   buildInputs = with pkgs; [
     #= Develop
-    tomet
-    tomet-lsp
-    tomet-shelf
-    twrit
+    tools
     just
     deno
     pagefind
