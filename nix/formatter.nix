@@ -6,16 +6,20 @@
     nixfmt.enable = true;
     statix.enable = true;
     deadnix.enable = true;
+
     #= Shell
     shfmt.enable = true;
     shellcheck.enable = true;
 
     #= Main
-    rustfmt.enable = true; # Rust
-    taplo.enable = true; # Toml
+    rustfmt.enable = true;
+    taplo.enable = true;
   };
+
   settings = {
-    global.excludes = [ ]; # https://github.com/numtide/treefmt-nix/issues/171
+    global.excludes = [
+      "*.lock"
+    ];
 
     formatter = {
       tomet = {
