@@ -1,17 +1,22 @@
 mod commands;
 
 use anyhow::Result;
-use clap::{Parser, Subcommand};
+use clap::{CommandFactory, Parser, Subcommand};
+use sisho_sdk::{Capabilities, ExtensionInfo};
 
 #[derive(Parser, Debug)]
 #[command(
-    name = "cli",
+    name = "sisho-corpus",
     version,
-    about = "tomet-sandbox: Transform dataset collections into tomet (.tmt) books"
+    about = "Corpus conversion, benchmarking, and stress-testing toolchains for the Tomet ecosystem"
 )]
 struct Cli {
+    /// Disclose extension metadata for sisho.
+    #[arg(long = "sisho-extension-info", hide = true)]
+    sisho_extension_info: bool,
+
     #[command(subcommand)]
-    command: Commands,
+    command: Option<Commands>,
 }
 
 #[derive(Subcommand, Debug)]
@@ -42,7 +47,27 @@ enum Commands {
 async fn main() -> Result<()> {
     let cli = Cli::parse();
 
-    match cli.command {
+    if cli.sisho_extension_info {
+        let info = ExtensionInfo::new(
+            "corpus",
+            env!("CARGO_PKG_VERSION"),
+            "Corpus conversion, benchmarking, and stress-testing toolchains",
+        )
+        .with_capabilities(Capabilities::default());
+        if let Err(error) = info.print() {
+            eprintln!("sisho-corpus: failed to write extension info: {error}");
+            std::process::exit(1);
+        }
+        return Ok(());
+    }
+
+    let Some(command) = cli.command else {
+        Cli::command().print_help()?;
+        println!();
+        return Ok(());
+    };
+
+    match command {
         Commands::Wiki(args) => commands::wiki::run_wiki(args).await?,
         Commands::Aozora(args) => commands::aozora::run_aozora(args).await?,
         Commands::Examples(args) => commands::examples::run_examples(args)?,

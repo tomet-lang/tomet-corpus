@@ -2,11 +2,11 @@
 name = "downloader"
 version.workspace = true
 edition.workspace = true
+publish = false
 
 [dependencies]
 tomet-wikitext = { workspace = true }
-
-#= Crates.io
+#--- Crates.io ---
 anyhow = { workspace = true }
 clap = { workspace = true }
 indicatif = { workspace = true }

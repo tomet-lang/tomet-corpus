@@ -1,6 +1,6 @@
 //! `cargo run -p tomet-synth --example gen -- <dir> <count> [wiki|prose] [seed] [target_bytes] [depth]`
 //!
-//! Writes a corpus to disk, e.g. to point `tomet-corpus check -p <dir>` or an
+//! Writes a corpus to disk, e.g. to point `sisho-corpus check -p <dir>` or an
 //! editor at it. `depth` sets both the heading and the list depth. Benchmarks
 //! should call the library directly instead.
 

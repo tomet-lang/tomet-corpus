@@ -1,21 +1,21 @@
 [package]
-name = "tomet-corpus-cli"
+name = "sisho-corpus"
 version.workspace = true
 edition.workspace = true
+publish = false
 
 [[bin]]
-name = "tomet-corpus"
+name = "sisho-corpus"
 path = "src/main.rs"
 
 [dependencies]
 downloader = { workspace = true }
 tomet-aozora = { workspace = true }
 tomet-wikitext = { workspace = true }
-
-#= Tomet
+#---
+sisho-sdk = { workspace = true }
 tomet-shelf = { workspace = true }
-
-#= Crates.io
+#--- Crates.io ---
 anyhow = { workspace = true }
 clap = { workspace = true }
 indicatif = { workspace = true }
