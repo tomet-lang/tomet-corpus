@@ -515,14 +515,16 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "clap",
+ "csv",
+ "encoding_rs",
  "indicatif",
  "reqwest",
  "serde",
  "serde_json",
  "tokio",
- "tomet-wikitext",
  "tracing",
  "urlencoding",
+ "zip",
 ]
 
 [[package]]
@@ -578,12 +580,6 @@ name = "fallible-streaming-iterator"
 version = "0.1.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7360491ce676a36bf9bb3c56c1aa791658183a54d2744120f27285738d90465a"
-
-[[package]]
-name = "fastrand"
-version = "2.5.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "da7c62ceae207dd37ea5b845da6a0696c799f85e97da1ab5b7910be3c1c80223"
 
 [[package]]
 name = "fdeflate"
@@ -1158,12 +1154,6 @@ dependencies = [
  "pkg-config",
  "vcpkg",
 ]
-
-[[package]]
-name = "linux-raw-sys"
-version = "0.12.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "32a66949e030da00e8c7d4434b251670a91556f4144941d37452769c25d58a53"
 
 [[package]]
 name = "litemap"
@@ -1772,19 +1762,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "6b1e7f9a428571be2dc5bc0505c13fb6bf936822b894ec87abf8a08a4e51742d"
 
 [[package]]
-name = "rustix"
-version = "1.1.5"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "891efababe418670775f199f0d233d84843c227a0949a883ce15b37c78d6629d"
-dependencies = [
- "bitflags 2.13.2",
- "errno",
- "libc",
- "linux-raw-sys",
- "windows-sys 0.61.2",
-]
-
-[[package]]
 name = "rustls"
 version = "0.23.45"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2081,19 +2058,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "tempfile"
-version = "3.27.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "32497e9a4c7b38532efcdebeef879707aa9f794296a4f0244f6f69e9bc8574bd"
-dependencies = [
- "fastrand",
- "getrandom 0.4.3",
- "once_cell",
- "rustix",
- "windows-sys 0.61.2",
-]
-
-[[package]]
 name = "text-size"
 version = "1.1.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2259,19 +2223,8 @@ dependencies = [
 name = "tomet-aozora"
 version = "0.1.0"
 dependencies = [
- "anyhow",
- "clap",
- "csv",
- "encoding_rs",
- "indicatif",
  "regex",
- "reqwest",
  "serde",
- "serde_json",
- "tokio",
- "tracing",
- "urlencoding",
- "zip",
 ]
 
 [[package]]
@@ -2568,11 +2521,8 @@ dependencies = [
 name = "tomet-wikitext"
 version = "0.1.0"
 dependencies = [
- "anyhow",
  "regex",
  "serde",
- "serde_json",
- "tempfile",
 ]
 
 [[package]]

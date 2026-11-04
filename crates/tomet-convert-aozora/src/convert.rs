@@ -1,14 +1,8 @@
+use std::sync::LazyLock;
+
 use regex::{Captures, Regex};
-use std::path::{Path, PathBuf};
-use std::sync::{Arc, LazyLock};
 
-use anyhow::{Context, Result};
-use clap::Args;
-use indicatif::{ProgressBar, ProgressStyle};
-use tokio::sync::Semaphore;
-use tokio::task::JoinSet;
-
-use crate::model::AozoraBook;
+use crate::model::AozoraMetadata;
 
 static RE_RUBY_PIPE: LazyLock<Regex> =
     LazyLock::new(|| Regex::new(r"[｜|]([^《\r\n]+)《([^》\r\n]+)》").unwrap());
@@ -45,43 +39,45 @@ impl AozoraToTometConverter {
         Self
     }
 
-    pub fn convert(&self, book: &AozoraBook) -> String {
+    pub fn convert(&self, content: &str, meta: &AozoraMetadata) -> String {
         let mut out = String::new();
 
-        // 1. @meta block
-        out.push_str("@meta{\n");
-        out.push_str(&format!("  id: {},\n", book.id));
-        out.push_str(&format!("  title: \"{}\",\n", escape_string(&book.title)));
-        out.push_str(&format!("  author: \"{}\",\n", escape_string(&book.author)));
-        if let Some(yomi) = &book.title_yomi {
+        // 1. ::meta block
+        out.push_str("::meta{\n");
+        if let Some(id) = meta.id {
+            out.push_str(&format!("  id: {},\n", id));
+        }
+        out.push_str(&format!("  title: \"{}\",\n", escape_string(&meta.title)));
+        out.push_str(&format!("  author: \"{}\",\n", escape_string(&meta.author)));
+        if let Some(yomi) = &meta.title_yomi {
             out.push_str(&format!("  title_yomi: \"{}\",\n", escape_string(yomi)));
         }
-        if let Some(yomi) = &book.author_yomi {
+        if let Some(yomi) = &meta.author_yomi {
             out.push_str(&format!("  author_yomi: \"{}\",\n", escape_string(yomi)));
         }
-        if let Some(date) = &book.release_date {
+        if let Some(date) = &meta.release_date {
             out.push_str(&format!("  release_date: \"{}\",\n", date));
         }
-        if let Some(ndc) = &book.ndc {
+        if let Some(ndc) = &meta.ndc {
             out.push_str(&format!("  ndc: \"{}\",\n", escape_string(ndc)));
         }
-        if let Some(kana) = &book.kana_type {
+        if let Some(kana) = &meta.kana_type {
             out.push_str(&format!("  kana_type: \"{}\",\n", escape_string(kana)));
         }
-        if !book.url.is_empty() {
-            out.push_str(&format!("  url.wiki: \"{}\",\n", escape_string(&book.url)));
+        if let Some(url) = &meta.url {
+            out.push_str(&format!("  url.wiki: \"{}\",\n", escape_string(url)));
         }
         out.push_str("}\n\n");
 
         // 2. Title and Author header
-        out.push_str(&format!("= {}\n\n", book.title));
-        if !book.author.is_empty() {
-            out.push_str(&format!("== {}\n\n", book.author));
+        out.push_str(&format!("= {}\n\n", meta.title));
+        if !meta.author.is_empty() {
+            out.push_str(&format!("== {}\n\n", meta.author));
         }
 
         // 3. Body transformation
         let (body, bibliography) =
-            self.split_and_clean_body(&book.content, &book.title, &book.author);
+            self.split_and_clean_body(content, &meta.title, &meta.author);
         let converted_body = self.convert_ruby(&body);
 
         out.push_str(&converted_body);
@@ -170,197 +166,6 @@ fn escape_string(s: &str) -> String {
     s.replace('\\', "\\\\").replace('"', "\\\"")
 }
 
-#[derive(Args, Debug, Clone)]
-pub struct ConvertArgs {
-    /// Directory containing raw downloaded JSON files
-    #[arg(short, long, default_value = "data/aozora/raw")]
-    pub input_dir: PathBuf,
-
-    /// Output directory for .tmt files
-    #[arg(short, long, default_value = "data/aozora/pages")]
-    pub output_dir: PathBuf,
-
-    /// Specific work title(s) to convert
-    #[arg(short, long)]
-    pub title: Vec<String>,
-
-    /// Overwrite existing converted files
-    #[arg(short, long, default_value_t = false)]
-    pub force: bool,
-
-    /// Max concurrent conversion tasks (defaults to CPU thread count)
-    #[arg(short = 'j', long)]
-    pub concurrency: Option<usize>,
-}
-
-enum ConvertOutcome {
-    Converted(String),
-    Skipped(String),
-    Failed(PathBuf, String),
-}
-
-pub async fn run_convert(args: ConvertArgs) -> Result<()> {
-    tokio::fs::create_dir_all(&args.output_dir)
-        .await
-        .with_context(|| format!("failed to create output dir: {:?}", args.output_dir))?;
-
-    let mut files_to_convert: Vec<PathBuf> = Vec::new();
-
-    if !args.title.is_empty() {
-        let mut entries = tokio::fs::read_dir(&args.input_dir)
-            .await
-            .with_context(|| format!("failed to read input directory {:?}", args.input_dir))?;
-
-        while let Some(entry) = entries.next_entry().await? {
-            let path = entry.path();
-            if path.is_file() && path.extension().and_then(|s| s.to_str()) == Some("json") {
-                let file_name = path.file_stem().unwrap_or_default().to_string_lossy();
-                for t in &args.title {
-                    if file_name.contains(t.as_str()) {
-                        files_to_convert.push(path.clone());
-                        break;
-                    }
-                }
-            }
-        }
-    } else {
-        let mut entries = tokio::fs::read_dir(&args.input_dir)
-            .await
-            .with_context(|| format!("failed to read input directory {:?}", args.input_dir))?;
-
-        while let Some(entry) = entries.next_entry().await? {
-            let path = entry.path();
-            if path.is_file() && path.extension().and_then(|s| s.to_str()) == Some("json") {
-                files_to_convert.push(path);
-            }
-        }
-    }
-
-    if files_to_convert.is_empty() {
-        println!("No JSON files found to convert in {:?}", args.input_dir);
-        return Ok(());
-    }
-
-    let total = files_to_convert.len();
-    let concurrency = args
-        .concurrency
-        .unwrap_or_else(|| {
-            std::thread::available_parallelism()
-                .map(|n| n.get())
-                .unwrap_or(4)
-        })
-        .max(1);
-
-    println!(
-        "Converting {} Aozora work(s) from {:?} to {:?} (concurrency: {})",
-        total, args.input_dir, args.output_dir, concurrency
-    );
-
-    let progress = ProgressBar::new(total as u64);
-    progress.set_style(
-        ProgressStyle::default_bar()
-            .template("{spinner:.green} [{elapsed_precise}] [{bar:30.cyan/blue}] {pos}/{len} ({percent}%) {msg}")
-            .unwrap()
-            .progress_chars("#>-"),
-    );
-
-    let converter = Arc::new(AozoraToTometConverter::new());
-    let semaphore = Arc::new(Semaphore::new(concurrency));
-    let mut join_set = JoinSet::new();
-
-    for input_path in files_to_convert {
-        let filename = input_path
-            .file_stem()
-            .unwrap()
-            .to_string_lossy()
-            .to_string();
-        let target_path = args.output_dir.join(format!("{}.tmt", filename));
-        let force = args.force;
-        let conv = Arc::clone(&converter);
-        let sem = Arc::clone(&semaphore);
-
-        join_set.spawn(async move {
-            if target_path.exists() && !force {
-                return ConvertOutcome::Skipped(filename);
-            }
-
-            let _permit = sem.acquire_owned().await.expect("semaphore closed");
-            match process_file(&conv, &input_path, &target_path).await {
-                Ok(title) => ConvertOutcome::Converted(title),
-                Err(e) => ConvertOutcome::Failed(input_path, e.to_string()),
-            }
-        });
-    }
-
-    let mut success_count = 0;
-    let mut skipped_count = 0;
-    let mut failed_articles: Vec<(PathBuf, String)> = Vec::new();
-
-    while let Some(res) = join_set.join_next().await {
-        match res {
-            Ok(ConvertOutcome::Converted(title)) => {
-                progress.println(format!("  [converted] {}", title));
-                success_count += 1;
-            }
-            Ok(ConvertOutcome::Skipped(title)) => {
-                progress.println(format!("  [skipped] {}", title));
-                skipped_count += 1;
-            }
-            Ok(ConvertOutcome::Failed(path, err)) => {
-                progress.println(format!(
-                    "  [error] {:?}: {}",
-                    path.file_name().unwrap_or_default(),
-                    err
-                ));
-                failed_articles.push((path, err));
-            }
-            Err(join_err) => {
-                eprintln!("Task join error: {}", join_err);
-            }
-        }
-        progress.inc(1);
-    }
-
-    progress.finish_with_message("Conversion complete");
-
-    let failed_count = failed_articles.len();
-    println!();
-    println!(
-        "Conversion finished: {} succeeded, {} skipped, {} failed (Total: {})",
-        success_count, skipped_count, failed_count, total
-    );
-
-    if !failed_articles.is_empty() {
-        eprintln!("\nFailed conversions:");
-        for (path, err) in &failed_articles {
-            eprintln!("  - {:?}: {}", path, err);
-        }
-    }
-
-    Ok(())
-}
-
-async fn process_file(
-    converter: &AozoraToTometConverter,
-    input_path: &Path,
-    target_path: &Path,
-) -> Result<String> {
-    let content = tokio::fs::read_to_string(input_path)
-        .await
-        .with_context(|| format!("failed to read {:?}", input_path))?;
-
-    let book: AozoraBook = serde_json::from_str(&content)
-        .with_context(|| format!("failed to parse JSON from {:?}", input_path))?;
-
-    let tmt_output = converter.convert(&book);
-
-    tokio::fs::write(target_path, tmt_output)
-        .await
-        .with_context(|| format!("failed to write {:?}", target_path))?;
-
-    Ok(format!("{} - {}", book.author, book.title))
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -401,17 +206,14 @@ mod tests {
     #[test]
     fn test_full_convert() {
         let converter = AozoraToTometConverter::new();
-        let book = AozoraBook {
-            id: 1567,
-            title: "走れメロス".to_string(),
-            author: "太宰治".to_string(),
-            url: "https://www.aozora.gr.jp/cards/000035/card1567.html".to_string(),
-            content: "走れメロス\r\n太宰治\r\n\r\n-------------------------------------------------------\r\n【テキスト中に現れる記号について】\r\n\r\n《》：ルビ\r\n-------------------------------------------------------\r\n\r\nメロスは激怒した。必ず、かの邪智暴虐《じゃちぼうぎゃく》の王を除かなければならぬと決意した。\r\n\r\n底本：「太宰治全集3」ちくま文庫\r\n入力：金川一之\r\n".to_string(),
-            ..Default::default()
-        };
+        let meta = AozoraMetadata::new("走れメロス", "太宰治")
+            .with_id(1567)
+            .with_url("https://www.aozora.gr.jp/cards/000035/card1567.html");
+        let content = "走れメロス\r\n太宰治\r\n\r\n-------------------------------------------------------\r\n【テキスト中に現れる記号について】\r\n\r\n《》：ルビ\r\n-------------------------------------------------------\r\n\r\nメロスは激怒した。必ず、かの邪智暴虐《じゃちぼうぎゃく》の王を除かなければならぬと決意した。\r\n\r\n底本：「太宰治全集3」ちくま文庫\r\n入力：金川一之\r\n";
 
-        let output = converter.convert(&book);
-        assert!(output.contains("@meta{"));
+        let output = converter.convert(content, &meta);
+        assert!(output.contains("::meta{"));
+        assert!(output.contains("id: 1567,"));
         assert!(output.contains("title: \"走れメロス\","));
         assert!(output.contains("author: \"太宰治\","));
         assert!(

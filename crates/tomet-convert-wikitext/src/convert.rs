@@ -2,7 +2,7 @@ use std::collections::HashMap;
 
 use regex::{Captures, Regex};
 
-use crate::model::WikiPage;
+use crate::model::WikitextMetadata;
 
 pub struct WikiToTometConverter {
     re_heading6: Regex,
@@ -67,14 +67,10 @@ impl WikiToTometConverter {
         }
     }
 
-    pub fn convert(&self, page: &WikiPage) -> String {
+    pub fn convert(&self, wikitext: &str, meta: &WikitextMetadata) -> String {
         let mut out = String::new();
 
-        let (infobox_fields, clean_source) = if let Some(source) = &page.source {
-            extract_infobox(source)
-        } else {
-            (Vec::new(), String::new())
-        };
+        let (infobox_fields, clean_source) = extract_infobox(wikitext);
 
         let (converted_body, categories) = if !clean_source.is_empty() {
             self.convert_wikitext_with_categories(&clean_source)
@@ -82,20 +78,17 @@ impl WikiToTometConverter {
             (String::new(), Vec::new())
         };
 
-        // 1. @meta block
-        out.push_str("@meta{\n");
-        out.push_str(&format!("  id: {},\n", page.id));
-        out.push_str(&format!("  title: \"{}\",\n", escape_string(&page.title)));
-        if let Some(latest) = &page.latest {
-            out.push_str(&format!("  timestamp: \"{}\",\n", latest.timestamp));
+        // 1. ::meta block
+        out.push_str("::meta{\n");
+        if let Some(id) = meta.id {
+            out.push_str(&format!("  id: {},\n", id));
         }
-        let wiki_url = page.url.clone().unwrap_or_else(|| {
-            let key = if page.key.is_empty() {
-                &page.title
-            } else {
-                &page.key
-            };
-            format!("https://ja.wikipedia.org/wiki/{}", key)
+        out.push_str(&format!("  title: \"{}\",\n", escape_string(&meta.title)));
+        if let Some(timestamp) = &meta.timestamp {
+            out.push_str(&format!("  timestamp: \"{}\",\n", escape_string(timestamp)));
+        }
+        let wiki_url = meta.url.clone().unwrap_or_else(|| {
+            format!("https://ja.wikipedia.org/wiki/{}", meta.title)
         });
         out.push_str(&format!("  url.wiki: \"{}\",\n", escape_string(&wiki_url)));
         if !categories.is_empty() {
@@ -105,7 +98,23 @@ impl WikiToTometConverter {
             }
             out.push_str("  ),\n");
         }
+        let mut seen_keys = std::collections::HashSet::new();
+        seen_keys.insert("title".to_string());
+        if meta.id.is_some() {
+            seen_keys.insert("id".to_string());
+        }
+        if meta.timestamp.is_some() {
+            seen_keys.insert("timestamp".to_string());
+        }
+        seen_keys.insert("url.wiki".to_string());
+        if !categories.is_empty() {
+            seen_keys.insert("categories".to_string());
+        }
+
         for (k, v) in &infobox_fields {
+            if !seen_keys.insert(k.clone()) {
+                continue;
+            }
             if let Ok(num) = v.parse::<i64>() {
                 out.push_str(&format!("  {}: {},\n", k, num));
             } else {
@@ -115,7 +124,7 @@ impl WikiToTometConverter {
         out.push_str("}\n\n");
 
         // 2. Title as Tomet H1
-        out.push_str(&format!("= {}\n\n", page.title));
+        out.push_str(&format!("= {}\n\n", meta.title));
 
         // 3. Body transformation
         if !converted_body.is_empty() {
@@ -1218,17 +1227,9 @@ mod tests {
     #[test]
     fn test_extract_infobox_to_meta() {
         let converter = WikiToTometConverter::new();
-        let page = WikiPage {
-            id: 123,
-            key: "テスト神社".to_string(),
-            title: "テスト神社".to_string(),
-            latest: None,
-            content_model: Some("wikitext".to_string()),
-            license: None,
-            source: Some("{{神社\n| 名称 = テスト神社\n| 所在地 = [[東京都]][[千代田区]]\n| 創建 = 1900年\n}}\n本文です。".to_string()),
-            ..Default::default()
-        };
-        let output = converter.convert(&page);
+        let meta = WikitextMetadata::new("テスト神社").with_id(123);
+        let source = "{{神社\n| 名称 = テスト神社\n| 所在地 = [[東京都]][[千代田区]]\n| 創建 = 1900年\n}}\n本文です。";
+        let output = converter.convert(source, &meta);
         assert!(output.contains("url.wiki: \"https://ja.wikipedia.org/wiki/テスト神社\","));
         assert!(output.contains("type: \"神社\","));
         assert!(output.contains("名称: \"テスト神社\","));
@@ -1236,9 +1237,6 @@ mod tests {
         assert!(output.contains("創建: \"1900年\","));
         assert!(output.contains("本文です。"));
         assert!(!output.contains("{{神社"));
-
-        crate::validator::validate_tmt_string(&output)
-            .expect("generated tomet document must be valid syntax");
     }
 
     #[test]
@@ -1256,67 +1254,38 @@ mod tests {
     #[test]
     fn test_definition_list_with_trailing_spaces_and_sub_bullets() {
         let converter = WikiToTometConverter::new();
-        let page = WikiPage {
-            id: 456,
-            key: "テスト映画".to_string(),
-            title: "テスト映画".to_string(),
-            latest: None,
-            content_model: Some("wikitext".to_string()),
-            license: None,
-            source: Some(
-                "; 翻案・演出 \n: [[監督]]\n; 映像ソフト\n:* 通常版\n:** 限定版（付録付き）\n"
-                    .to_string(),
-            ),
-            ..Default::default()
-        };
-        let output = converter.convert(&page);
+        let meta = WikitextMetadata::new("テスト映画").with_id(456);
+        let source = "; 翻案・演出 \n: [[監督]]\n; 映像ソフト\n:* 通常版\n:** 限定版（付録付き）\n";
+        let output = converter.convert(source, &meta);
         assert!(output.contains("- **翻案・演出**"));
         assert!(output.contains("- 通常版"));
         assert!(output.contains("  - 限定版（付録付き）"));
-        crate::validator::validate_tmt_string(&output)
-            .expect("valid syntax for definition list and sub bullets");
     }
 
     #[test]
     fn test_categories_extracted_to_meta() {
         let converter = WikiToTometConverter::new();
-        let page = WikiPage {
-            id: 789,
-            key: "テスト国".to_string(),
-            title: "テスト国".to_string(),
-            latest: None,
-            content_model: Some("wikitext".to_string()),
-            license: None,
-            source: Some("国です。\n[[Category:アジアの国]]\n[[カテゴリ:島国]]\n".to_string()),
-            ..Default::default()
-        };
-        let output = converter.convert(&page);
+        let meta = WikitextMetadata::new("テスト国").with_id(789);
+        let source = "国です。\n[[Category:アジアの国]]\n[[カテゴリ:島国]]\n";
+        let output = converter.convert(source, &meta);
         assert!(output.contains("categories: list("));
         assert!(output.contains("\"アジアの国\","));
         assert!(output.contains("\"島国\","));
         assert!(!output.contains("[[Category:"));
-        crate::validator::validate_tmt_string(&output)
-            .expect("valid syntax with categories in meta");
     }
 
     #[test]
     fn test_custom_page_url_in_meta() {
         let converter = WikiToTometConverter::new();
-        let page = WikiPage {
-            id: 100,
-            key: "Rust".to_string(),
-            title: "Rust".to_string(),
-            url: Some("https://en.wikipedia.org/wiki/Rust_(programming_language)".to_string()),
-            ..Default::default()
-        };
-        let output = converter.convert(&page);
+        let meta = WikitextMetadata::new("Rust")
+            .with_id(100)
+            .with_url("https://en.wikipedia.org/wiki/Rust_(programming_language)");
+        let output = converter.convert("", &meta);
         assert!(
             output.contains(
                 "url.wiki: \"https://en.wikipedia.org/wiki/Rust_(programming_language)\","
             )
         );
-        crate::validator::validate_tmt_string(&output)
-            .expect("valid syntax with custom url in meta");
     }
 
     #[test]

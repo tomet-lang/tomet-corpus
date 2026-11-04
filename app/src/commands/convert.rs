@@ -6,7 +6,7 @@ use clap::Args;
 use indicatif::{ProgressBar, ProgressStyle};
 use tokio::sync::Semaphore;
 use tokio::task::JoinSet;
-use tomet_wikitext::{WikiPage, WikiToTometConverter, sanitize_filename};
+use tomet_wikitext::{WikiToTometConverter, WikitextMetadata};
 
 #[derive(Args, Debug, Clone)]
 pub struct ConvertArgs {
@@ -50,7 +50,7 @@ pub async fn run_convert(args: ConvertArgs) -> Result<()> {
 
     if !args.title.is_empty() {
         for t in &args.title {
-            let filename = sanitize_filename(t) + ".json";
+            let filename = downloader::sanitize_filename(t) + ".json";
             let path = args.input_dir.join(filename);
             if path.exists() {
                 files_to_convert.push(path);
@@ -175,7 +175,7 @@ pub async fn run_convert(args: ConvertArgs) -> Result<()> {
     if args.validate && (success_count > 0 || (skipped_count > 0 && failed_count == 0)) {
         println!();
         println!("Checking tomet syntax for: {:?}", args.output_dir);
-        tomet_wikitext::validate_path(&args.output_dir)?;
+        crate::validator::validate_path(&args.output_dir)?;
         println!("Validation passed successfully!");
     }
 
@@ -191,10 +191,18 @@ async fn process_file(
         .await
         .with_context(|| format!("failed to read {:?}", input_path))?;
 
-    let page: WikiPage = serde_json::from_str(&content)
+    let page: downloader::wiki::WikiPage = serde_json::from_str(&content)
         .with_context(|| format!("failed to parse JSON from {:?}", input_path))?;
 
-    let tmt_output = converter.convert(&page);
+    let meta = WikitextMetadata {
+        id: Some(page.id),
+        title: page.title.clone(),
+        timestamp: page.latest.as_ref().map(|l| l.timestamp.clone()),
+        url: page.url.clone(),
+    };
+
+    let source = page.source.as_deref().unwrap_or_default();
+    let tmt_output = converter.convert(source, &meta);
 
     tokio::fs::write(target_path, tmt_output)
         .await

@@ -1,94 +1,69 @@
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Clone, Serialize, Deserialize, Default)]
-pub struct AozoraBook {
-    pub id: u64,
+/// In-memory metadata for an Aozora Bunko work to be converted to Tomet markup.
+#[derive(Debug, Clone, Default, PartialEq, Eq, Serialize, Deserialize)]
+pub struct AozoraMetadata {
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub id: Option<u64>,
+    #[serde(default)]
     pub title: String,
+    #[serde(default)]
+    pub author: String,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub title_yomi: Option<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub subtitle: Option<String>,
-    pub author: String,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub author_yomi: Option<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub person_id: Option<u64>,
-    pub url: String,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub release_date: Option<String>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub last_modified: Option<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub ndc: Option<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub kana_type: Option<String>,
-    #[serde(default)]
-    pub copyright: bool,
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub text_url: Option<String>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub html_url: Option<String>,
-    pub content: String,
+    pub url: Option<String>,
 }
 
-#[derive(Debug, Clone, Deserialize)]
-pub struct AozoraCatalogEntry {
-    #[serde(rename = "作品ID")]
-    pub book_id: String,
-    #[serde(rename = "作品名")]
-    pub title: String,
-    #[serde(rename = "作品名読み", default)]
-    pub title_yomi: String,
-    #[serde(rename = "副題", default)]
-    pub subtitle: String,
-    #[serde(rename = "分類番号", default)]
-    pub ndc: String,
-    #[serde(rename = "文字遣い種別", default)]
-    pub kana_type: String,
-    #[serde(rename = "作品著作権フラグ", default)]
-    pub copyright_flag: String,
-    #[serde(rename = "公開日", default)]
-    pub release_date: String,
-    #[serde(rename = "最終更新日", default)]
-    pub last_modified: String,
-    #[serde(rename = "図書カードURL", default)]
-    pub card_url: String,
-    #[serde(rename = "人物ID", default)]
-    pub person_id: String,
-    #[serde(rename = "姓", default)]
-    pub last_name: String,
-    #[serde(rename = "名", default)]
-    pub first_name: String,
-    #[serde(rename = "姓読み", default)]
-    pub last_name_yomi: String,
-    #[serde(rename = "名読み", default)]
-    pub first_name_yomi: String,
-    #[serde(rename = "役割フラグ", default)]
-    pub role_flag: String,
-    #[serde(rename = "テキストファイルURL", default)]
-    pub text_url: String,
-    #[serde(rename = "XHTML/HTMLファイルURL", default)]
-    pub html_url: String,
-}
-
-impl AozoraCatalogEntry {
-    pub fn author(&self) -> String {
-        format!("{}{}", self.last_name, self.first_name)
+impl AozoraMetadata {
+    pub fn new(title: impl Into<String>, author: impl Into<String>) -> Self {
+        Self {
+            title: title.into(),
+            author: author.into(),
+            ..Default::default()
+        }
     }
 
-    pub fn author_yomi(&self) -> String {
-        format!("{}{}", self.last_name_yomi, self.first_name_yomi)
+    pub fn with_id(mut self, id: u64) -> Self {
+        self.id = Some(id);
+        self
     }
 
-    pub fn is_author(&self) -> bool {
-        self.role_flag == "著者" || self.role_flag.is_empty()
+    pub fn with_title_yomi(mut self, yomi: impl Into<String>) -> Self {
+        self.title_yomi = Some(yomi.into());
+        self
     }
 
-    pub fn has_text(&self) -> bool {
-        !self.text_url.is_empty() && self.text_url.ends_with(".zip")
+    pub fn with_author_yomi(mut self, yomi: impl Into<String>) -> Self {
+        self.author_yomi = Some(yomi.into());
+        self
     }
 
-    pub fn id_u64(&self) -> Option<u64> {
-        self.book_id.trim().parse::<u64>().ok()
+    pub fn with_release_date(mut self, date: impl Into<String>) -> Self {
+        self.release_date = Some(date.into());
+        self
+    }
+
+    pub fn with_ndc(mut self, ndc: impl Into<String>) -> Self {
+        self.ndc = Some(ndc.into());
+        self
+    }
+
+    pub fn with_kana_type(mut self, kana_type: impl Into<String>) -> Self {
+        self.kana_type = Some(kana_type.into());
+        self
+    }
+
+    pub fn with_url(mut self, url: impl Into<String>) -> Self {
+        self.url = Some(url.into());
+        self
     }
 }

@@ -5,7 +5,7 @@ use reqwest::Client;
 use reqwest::header::{HeaderMap, HeaderValue, USER_AGENT};
 use zip::ZipArchive;
 
-use crate::model::{AozoraBook, AozoraCatalogEntry};
+use super::model::{AozoraBook, AozoraCatalogEntry};
 
 pub struct AozoraClient {
     client: Client,

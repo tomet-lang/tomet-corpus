@@ -1,4 +1,5 @@
 mod commands;
+pub mod validator;
 
 use anyhow::Result;
 use clap::{CommandFactory, Parser, Subcommand};

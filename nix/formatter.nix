@@ -13,7 +13,30 @@
 
     #= Main
     rustfmt.enable = true;
-    taplo.enable = true;
+    taplo = {
+      enable = true;
+      settings = {
+        formatting = {
+          align_entries = true;
+          align_comments = true;
+          reorder_keys = false;
+          column_width = 120;
+        };
+        rule = [
+          {
+            include = [ "Cargo.toml" ];
+            keys = [
+              "dependencies"
+              "dev-dependencies"
+              "build-dependencies"
+            ];
+            formatting = {
+              reorder_keys = true;
+            };
+          }
+        ];
+      };
+    };
   };
 
   settings = {

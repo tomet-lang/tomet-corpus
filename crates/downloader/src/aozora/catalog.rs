@@ -6,7 +6,7 @@ use anyhow::{Context, Result, bail};
 use reqwest::Client;
 use zip::ZipArchive;
 
-use crate::model::AozoraCatalogEntry;
+use super::model::AozoraCatalogEntry;
 
 pub const AOZORA_CATALOG_ZIP_URL: &str =
     "https://www.aozora.gr.jp/index_pages/list_person_all_extended_utf8.zip";

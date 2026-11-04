@@ -1,7 +1,5 @@
-pub mod client;
-pub mod download;
-pub mod model;
+pub mod aozora;
+pub mod util;
+pub mod wiki;
 
-pub use client::{MediaWikiClient, MediaWikiEndpoint};
-pub use download::{DownloadArgs, run_download, sanitize_filename};
-pub use model::{ActionQueryResponse, CategoryQueryResult, RandomQueryResult, WikiPage};
+pub use util::{sanitize_aozora_filename, sanitize_filename};

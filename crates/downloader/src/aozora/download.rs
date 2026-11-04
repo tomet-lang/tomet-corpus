@@ -6,9 +6,10 @@ use clap::Args;
 use indicatif::{ProgressBar, ProgressStyle};
 use tokio::time::sleep;
 
-use crate::catalog::AozoraCatalog;
-use crate::client::AozoraClient;
-use crate::model::AozoraCatalogEntry;
+use super::catalog::AozoraCatalog;
+use super::client::AozoraClient;
+use super::model::AozoraCatalogEntry;
+use crate::util::sanitize_aozora_filename;
 
 #[derive(Args, Debug, Clone)]
 pub struct DownloadArgs {
@@ -190,38 +191,4 @@ pub async fn run_download(args: DownloadArgs) -> Result<Vec<PathBuf>> {
     );
 
     Ok(saved_files)
-}
-
-/// Sanitize author and title into a safe filename
-pub fn sanitize_aozora_filename(author: &str, title: &str) -> String {
-    let combined = if author.is_empty() {
-        title.to_string()
-    } else {
-        format!("{}_{}", author, title)
-    };
-
-    combined
-        .chars()
-        .map(|c| match c {
-            '/' | '\\' | ':' | '*' | '?' | '"' | '<' | '>' | '|' | ' ' | '\t' | '\n' => '_',
-            _ => c,
-        })
-        .collect()
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_sanitize_filename() {
-        assert_eq!(
-            sanitize_aozora_filename("太宰治", "走れメロス"),
-            "太宰治_走れメロス"
-        );
-        assert_eq!(
-            sanitize_aozora_filename("Author/Name", "Title: Subtitle?"),
-            "Author_Name_Title__Subtitle_"
-        );
-    }
 }

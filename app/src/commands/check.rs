@@ -18,7 +18,7 @@ pub fn run_check(args: &CheckArgs) -> Result<()> {
     if !args.quiet {
         println!("Checking tomet syntax for: {:?}", args.path);
     }
-    tomet_wikitext::validate_path(&args.path)?;
+    crate::validator::validate_path(&args.path)?;
     if !args.quiet {
         println!("Validation passed successfully!");
     }

@@ -1,25 +1,25 @@
 [package]
-name = "sisho-corpus"
+name              = "sisho-corpus"
 version.workspace = true
 edition.workspace = true
-publish = false
+publish           = false
 
 [[bin]]
 name = "sisho-corpus"
 path = "src/main.rs"
 
 [dependencies]
-downloader = { workspace = true }
-tomet-aozora = { workspace = true }
+downloader     = { workspace = true }
+tomet-aozora   = { workspace = true }
 tomet-wikitext = { workspace = true }
 #---
-sisho-sdk = { workspace = true }
+sisho-sdk   = { workspace = true }
 tomet-shelf = { workspace = true }
 #--- Crates.io ---
-anyhow = { workspace = true }
-clap = { workspace = true }
-indicatif = { workspace = true }
-serde_json = { workspace = true }
-tokio = { workspace = true }
-tracing = { workspace = true }
+anyhow             = { workspace = true }
+clap               = { workspace = true }
+indicatif          = { workspace = true }
+serde_json         = { workspace = true }
+tokio              = { workspace = true }
+tracing            = { workspace = true }
 tracing-subscriber = { workspace = true }

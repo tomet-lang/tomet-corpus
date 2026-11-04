@@ -56,7 +56,7 @@ pub struct SyncArgs {
 
 pub async fn run_sync(args: SyncArgs) -> Result<()> {
     println!("=== Step 1: Downloading from {} ===", args.host);
-    let dl_args = downloader::DownloadArgs {
+    let dl_args = downloader::wiki::DownloadArgs {
         title: args.title.clone(),
         random: args.random,
         category: args.category.clone(),
@@ -68,7 +68,7 @@ pub async fn run_sync(args: SyncArgs) -> Result<()> {
         delay_ms: 300,
     };
 
-    let downloaded_files = downloader::run_download(dl_args).await?;
+    let downloaded_files = downloader::wiki::run_download(dl_args).await?;
     if downloaded_files.is_empty() {
         println!("No new or existing files to convert.");
         return Ok(());

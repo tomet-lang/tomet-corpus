@@ -7,6 +7,7 @@ use indicatif::{ProgressBar, ProgressStyle};
 use tokio::time::sleep;
 
 use super::client::{MediaWikiClient, MediaWikiEndpoint};
+use crate::util::sanitize_filename;
 
 #[derive(Args, Debug, Clone)]
 pub struct DownloadArgs {
@@ -163,5 +164,3 @@ pub async fn run_download(args: DownloadArgs) -> Result<Vec<PathBuf>> {
 
     Ok(saved_files)
 }
-
-pub use tomet_wikitext::sanitize_filename;

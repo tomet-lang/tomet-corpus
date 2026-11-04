@@ -1,8 +1,8 @@
 [book]
 title = "Tomet Corpus docs"
-lang = "en"
-dest = "dist"
+lang  = "en"
+dest  = "dist"
 
 [build]
-base = "/tomet-corpus"
+base  = "/tomet-corpus"
 kinds = ["*", "!config", "!index"]
