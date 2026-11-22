@@ -1,10 +1,10 @@
-@meta{
-  id: 900002,
-  title: "峠の茶屋",
-  author: "無名",
-  release_date: "2026-10-16",
-  kana_type: "新字新仮名",
-}
+::id("900002")
+::meta(
+  title:        "峠の茶屋"
+  author:       "無名"
+  release_date: "2026-10-16"
+  kana_type:    "新字新仮名"
+)
 
 = 峠の茶屋
 

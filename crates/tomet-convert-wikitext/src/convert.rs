@@ -78,25 +78,26 @@ impl WikiToTometConverter {
             (String::new(), Vec::new())
         };
 
-        // 1. ::meta block
-        out.push_str("::meta{\n");
+        // 1. ::id and ::meta declarations
         if let Some(id) = meta.id {
-            out.push_str(&format!("  id: {},\n", id));
+            out.push_str(&format!("::id(\"{}\")\n", id));
         }
-        out.push_str(&format!("  title: \"{}\",\n", escape_string(&meta.title)));
+        out.push_str("::meta(\n");
+        out.push_str(&format!("  title: \"{}\"\n", escape_string(&meta.title)));
         if let Some(timestamp) = &meta.timestamp {
-            out.push_str(&format!("  timestamp: \"{}\",\n", escape_string(timestamp)));
+            out.push_str(&format!("  timestamp: \"{}\"\n", escape_string(timestamp)));
         }
-        let wiki_url = meta.url.clone().unwrap_or_else(|| {
-            format!("https://ja.wikipedia.org/wiki/{}", meta.title)
-        });
-        out.push_str(&format!("  url.wiki: \"{}\",\n", escape_string(&wiki_url)));
+        let wiki_url = meta
+            .url
+            .clone()
+            .unwrap_or_else(|| format!("https://ja.wikipedia.org/wiki/{}", meta.title));
+        out.push_str(&format!("  url.wiki: \"{}\"\n", escape_string(&wiki_url)));
         if !categories.is_empty() {
-            out.push_str("  categories: list(\n");
+            out.push_str("  categories: (\n");
             for cat in &categories {
-                out.push_str(&format!("    \"{}\",\n", escape_string(cat)));
+                out.push_str(&format!("    \"{}\"\n", escape_string(cat)));
             }
-            out.push_str("  ),\n");
+            out.push_str("  )\n");
         }
         let mut seen_keys = std::collections::HashSet::new();
         seen_keys.insert("title".to_string());
@@ -116,12 +117,12 @@ impl WikiToTometConverter {
                 continue;
             }
             if let Ok(num) = v.parse::<i64>() {
-                out.push_str(&format!("  {}: {},\n", k, num));
+                out.push_str(&format!("  {}: {}\n", k, num));
             } else {
-                out.push_str(&format!("  {}: \"{}\",\n", k, escape_string(v)));
+                out.push_str(&format!("  {}: \"{}\"\n", k, escape_string(v)));
             }
         }
-        out.push_str("}\n\n");
+        out.push_str(")\n\n");
 
         // 2. Title as Tomet H1
         out.push_str(&format!("= {}\n\n", meta.title));
@@ -1230,11 +1231,12 @@ mod tests {
         let meta = WikitextMetadata::new("テスト神社").with_id(123);
         let source = "{{神社\n| 名称 = テスト神社\n| 所在地 = [[東京都]][[千代田区]]\n| 創建 = 1900年\n}}\n本文です。";
         let output = converter.convert(source, &meta);
-        assert!(output.contains("url.wiki: \"https://ja.wikipedia.org/wiki/テスト神社\","));
-        assert!(output.contains("type: \"神社\","));
-        assert!(output.contains("名称: \"テスト神社\","));
-        assert!(output.contains("所在地: \"東京都千代田区\","));
-        assert!(output.contains("創建: \"1900年\","));
+        assert!(output.contains("::id(\"123\")"));
+        assert!(output.contains("url.wiki: \"https://ja.wikipedia.org/wiki/テスト神社\""));
+        assert!(output.contains("type: \"神社\""));
+        assert!(output.contains("名称: \"テスト神社\""));
+        assert!(output.contains("所在地: \"東京都千代田区\""));
+        assert!(output.contains("創建: \"1900年\""));
         assert!(output.contains("本文です。"));
         assert!(!output.contains("{{神社"));
     }
@@ -1268,9 +1270,9 @@ mod tests {
         let meta = WikitextMetadata::new("テスト国").with_id(789);
         let source = "国です。\n[[Category:アジアの国]]\n[[カテゴリ:島国]]\n";
         let output = converter.convert(source, &meta);
-        assert!(output.contains("categories: list("));
-        assert!(output.contains("\"アジアの国\","));
-        assert!(output.contains("\"島国\","));
+        assert!(output.contains("categories: ("));
+        assert!(output.contains("\"アジアの国\""));
+        assert!(output.contains("\"島国\""));
         assert!(!output.contains("[[Category:"));
     }
 
@@ -1283,7 +1285,7 @@ mod tests {
         let output = converter.convert("", &meta);
         assert!(
             output.contains(
-                "url.wiki: \"https://en.wikipedia.org/wiki/Rust_(programming_language)\","
+                "url.wiki: \"https://en.wikipedia.org/wiki/Rust_(programming_language)\""
             )
         );
     }

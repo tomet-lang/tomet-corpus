@@ -42,32 +42,32 @@ impl AozoraToTometConverter {
     pub fn convert(&self, content: &str, meta: &AozoraMetadata) -> String {
         let mut out = String::new();
 
-        // 1. ::meta block
-        out.push_str("::meta{\n");
+        // 1. ::id and ::meta declarations
         if let Some(id) = meta.id {
-            out.push_str(&format!("  id: {},\n", id));
+            out.push_str(&format!("::id(\"{}\")\n", id));
         }
-        out.push_str(&format!("  title: \"{}\",\n", escape_string(&meta.title)));
-        out.push_str(&format!("  author: \"{}\",\n", escape_string(&meta.author)));
+        out.push_str("::meta(\n");
+        out.push_str(&format!("  title: \"{}\"\n", escape_string(&meta.title)));
+        out.push_str(&format!("  author: \"{}\"\n", escape_string(&meta.author)));
         if let Some(yomi) = &meta.title_yomi {
-            out.push_str(&format!("  title_yomi: \"{}\",\n", escape_string(yomi)));
+            out.push_str(&format!("  title_yomi: \"{}\"\n", escape_string(yomi)));
         }
         if let Some(yomi) = &meta.author_yomi {
-            out.push_str(&format!("  author_yomi: \"{}\",\n", escape_string(yomi)));
+            out.push_str(&format!("  author_yomi: \"{}\"\n", escape_string(yomi)));
         }
         if let Some(date) = &meta.release_date {
-            out.push_str(&format!("  release_date: \"{}\",\n", date));
+            out.push_str(&format!("  release_date: \"{}\"\n", date));
         }
         if let Some(ndc) = &meta.ndc {
-            out.push_str(&format!("  ndc: \"{}\",\n", escape_string(ndc)));
+            out.push_str(&format!("  ndc: \"{}\"\n", escape_string(ndc)));
         }
         if let Some(kana) = &meta.kana_type {
-            out.push_str(&format!("  kana_type: \"{}\",\n", escape_string(kana)));
+            out.push_str(&format!("  kana_type: \"{}\"\n", escape_string(kana)));
         }
         if let Some(url) = &meta.url {
-            out.push_str(&format!("  url.wiki: \"{}\",\n", escape_string(url)));
+            out.push_str(&format!("  url.wiki: \"{}\"\n", escape_string(url)));
         }
-        out.push_str("}\n\n");
+        out.push_str(")\n\n");
 
         // 2. Title and Author header
         out.push_str(&format!("= {}\n\n", meta.title));
@@ -76,8 +76,7 @@ impl AozoraToTometConverter {
         }
 
         // 3. Body transformation
-        let (body, bibliography) =
-            self.split_and_clean_body(content, &meta.title, &meta.author);
+        let (body, bibliography) = self.split_and_clean_body(content, &meta.title, &meta.author);
         let converted_body = self.convert_ruby(&body);
 
         out.push_str(&converted_body);
@@ -212,12 +211,12 @@ mod tests {
         let content = "走れメロス\r\n太宰治\r\n\r\n-------------------------------------------------------\r\n【テキスト中に現れる記号について】\r\n\r\n《》：ルビ\r\n-------------------------------------------------------\r\n\r\nメロスは激怒した。必ず、かの邪智暴虐《じゃちぼうぎゃく》の王を除かなければならぬと決意した。\r\n\r\n底本：「太宰治全集3」ちくま文庫\r\n入力：金川一之\r\n";
 
         let output = converter.convert(content, &meta);
-        assert!(output.contains("::meta{"));
-        assert!(output.contains("id: 1567,"));
-        assert!(output.contains("title: \"走れメロス\","));
-        assert!(output.contains("author: \"太宰治\","));
+        assert!(output.contains("::id(\"1567\")"));
+        assert!(output.contains("::meta("));
+        assert!(output.contains("title: \"走れメロス\""));
+        assert!(output.contains("author: \"太宰治\""));
         assert!(
-            output.contains("url.wiki: \"https://www.aozora.gr.jp/cards/000035/card1567.html\",")
+            output.contains("url.wiki: \"https://www.aozora.gr.jp/cards/000035/card1567.html\"")
         );
         assert!(output.contains("= 走れメロス"));
         assert!(output.contains("== 太宰治"));

@@ -13,9 +13,10 @@ downloader     = { workspace = true }
 tomet-aozora   = { workspace = true }
 tomet-wikitext = { workspace = true }
 #---
-sisho-sdk   = { workspace = true }
-tomet       = { workspace = true }
-tomet-shelf = { workspace = true }
+sisho-sdk            = { workspace = true }
+tomet                = { workspace = true }
+tomet-shelf-assets   = { workspace = true }
+tomet-shelf-headless = { workspace = true }
 #--- Crates.io ---
 anyhow             = { workspace = true }
 clap               = { workspace = true }

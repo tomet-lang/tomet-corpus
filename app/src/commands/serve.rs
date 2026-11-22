@@ -1,5 +1,6 @@
 use std::net::IpAddr;
 use std::path::PathBuf;
+use std::sync::Arc;
 
 use anyhow::{Context, Result};
 use clap::Args;
@@ -24,7 +25,7 @@ pub struct ServeArgs {
 }
 
 pub async fn run_serve(args: ServeArgs) -> Result<()> {
-    let config = tomet_shelf::BookConfig::load_from_dir(&args.dir)
+    let config = tomet_shelf_headless::BookConfig::load_from_dir(&args.dir)
         .with_context(|| format!("failed to load config from {:?}", args.dir))?;
     let src_dir = args
         .dir
@@ -32,7 +33,15 @@ pub async fn run_serve(args: ServeArgs) -> Result<()> {
         .context("failed to resolve source dir")?;
     let out_dir = args.dest.unwrap_or_else(|| src_dir.join(&config.book.dest));
 
-    tomet_shelf::run_dev_server(src_dir, out_dir, config, args.host, args.port).await?;
+    tomet_shelf_headless::run_dev_server(
+        src_dir,
+        out_dir,
+        config,
+        Arc::new(tomet_shelf_assets::ASSETS),
+        args.host,
+        args.port,
+    )
+    .await?;
 
     Ok(())
 }

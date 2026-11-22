@@ -1,15 +1,13 @@
-@config(
-  export: {
-    type: commonmark,
-    path: "README.md"
-  }
+::id(doc-readme)
+::export(
+  type: commonmark
+  path: "README.md"
 )
-@meta{
-  id: doc-readme,
+::meta(
   lang: en
-}
+)
 
-${macro.generated_by(self.path)}
+$macro.generated_by(self::path)
 
 =[ Tomet Corpus ]
 
@@ -36,18 +34,21 @@ Supported corpus sources include:
 ==[ Building and Running ]
 
 === Build workspace
+
 ```bash
-cargo build --workspace
+`` cargo build --workspace
 ```
 
 === Run tests
+
 ```bash
-cargo test --workspace
+`` cargo test --workspace
 ```
 
 === Convert corpus
+
 ```bash
-cargo run -p sisho-corpus -- sync
+`` cargo run -p sisho-corpus -- sync
 ```
 
 ==[ Synthetic Corpora ]
@@ -55,14 +56,14 @@ cargo run -p sisho-corpus -- sync
 `tomet-synth` generates documents of any size or count without committing them: the same `(seed, index, config)` always yields byte-identical text. It is meant to be used as a dev-dependency by the benchmarks in the consumer repositories.
 
 ```rust
-use tomet_synth::{Config, Corpus};
-
-let corpus = Corpus::new(42, Config::wiki().with_universe(10_000));
-let doc = corpus.doc(7);               // one document
-corpus.write_to(dir, 10_000)?;         // or a sharded directory tree
+`` use tomet_synth::{Config, Corpus};
+``
+`` let corpus = Corpus::new(42, Config::wiki().with_universe(10_000));
+`` let doc = corpus.doc(7);               // one document
+`` corpus.write_to(dir, 10_000)?;         // or a sharded directory tree
 ```
 
 To inspect a corpus by hand:
 ```bash
-cargo run -p tomet-synth --example gen -- /tmp/synth 1000 wiki
+`` cargo run -p tomet-synth --example gen -- /tmp/synth 1000 wiki
 ```

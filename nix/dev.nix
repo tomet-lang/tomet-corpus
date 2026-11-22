@@ -26,6 +26,7 @@ mkShell rec {
     #= Build
     pkg-config
     esbuild
+    lightningcss
     tailwindcss_4
 
     #= Rust

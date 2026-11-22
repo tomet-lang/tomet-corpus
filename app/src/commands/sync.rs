@@ -91,11 +91,17 @@ pub async fn run_sync(args: SyncArgs) -> Result<()> {
         println!();
         println!("=== Step 3: Building book with tomet-shelf ===");
         let src_dir = std::env::current_dir()?;
-        let config = tomet_shelf::BookConfig::load_from_dir(&src_dir)
+        let config = tomet_shelf_headless::BookConfig::load_from_dir(&src_dir)
             .context("Failed to load shelf.toml configuration")?;
         let out_dir = src_dir.join(&config.book.dest);
 
-        let report = tomet_shelf::build_book(&src_dir, &out_dir, &config, false)?;
+        let report = tomet_shelf_headless::build_book(
+            &src_dir,
+            &out_dir,
+            &config,
+            &tomet_shelf_assets::ASSETS,
+            false,
+        )?;
         if !report.failures.is_empty() {
             anyhow::bail!(
                 "{} document(s) failed during tomet-shelf build",

@@ -124,23 +124,23 @@ fn parse_meta_stats(
     for line in content.lines() {
         let trimmed = line.trim();
 
-        if trimmed.starts_with("@meta{") {
+        if trimmed.starts_with("::meta(") {
             in_meta = true;
             continue;
         }
 
         if in_meta {
-            if trimmed.starts_with('}') && !in_categories {
+            if trimmed.starts_with(')') && !in_categories {
                 break;
             }
 
-            if trimmed.starts_with("categories: [") {
+            if trimmed.starts_with("categories: (") {
                 in_categories = true;
                 continue;
             }
 
             if in_categories {
-                if trimmed.starts_with(']') {
+                if trimmed.starts_with(')') {
                     in_categories = false;
                     continue;
                 }

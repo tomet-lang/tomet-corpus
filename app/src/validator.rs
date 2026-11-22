@@ -27,7 +27,10 @@ pub fn validate_path(path: &Path) -> Result<()> {
     }
 
     if failed > 0 {
-        bail!("Tomet validation failed for {failed} of {} file(s)", files.len());
+        bail!(
+            "Tomet validation failed for {failed} of {} file(s)",
+            files.len()
+        );
     }
 
     Ok(())
@@ -35,8 +38,7 @@ pub fn validate_path(path: &Path) -> Result<()> {
 
 /// Validate raw in-memory .tmt string content directly using the `tomet` crate.
 pub fn validate_str(src: &str) -> Result<()> {
-    let doc = tomet::parser::parse_document(src)
-        .context("Failed to parse tomet document")?;
+    let doc = tomet::parse_file(src).context("Failed to parse tomet document")?;
     let diagnostics = tomet::validator::validate_document(&doc);
 
     let errors: Vec<_> = diagnostics
@@ -60,8 +62,7 @@ fn validate_file_with_vault(vault: &tomet::Vault, path: &Path) -> Result<()> {
     let src = std::fs::read_to_string(path)
         .with_context(|| format!("Failed to read file: {:?}", path))?;
 
-    let doc = tomet::parser::parse_document(&src)
-        .with_context(|| format!("Parse error in {:?}", path))?;
+    let doc = tomet::parse_file(&src).with_context(|| format!("Parse error in {:?}", path))?;
 
     let bindings = vault.bindings(&doc);
     let diagnostics = tomet::validator::validate_document_with(&doc, &bindings);
@@ -112,7 +113,7 @@ mod tests {
 
     #[test]
     fn test_validate_unknown_element_fails() {
-        let content = "@nonexistent_element{}\n";
+        let content = "@nonexistent_element[]\n";
         let err = validate_str(content).expect_err("should detect unknown element");
         assert!(err.to_string().contains("nonexistent_element"));
     }
@@ -142,5 +143,21 @@ mod tests {
 
         assert!(validate_path(&file1).is_ok());
         assert!(validate_path(temp_dir.path()).is_ok());
+    }
+
+    #[test]
+    fn test_validate_aozora_converter_output() {
+        let converter = tomet_aozora::AozoraToTometConverter::new();
+        let meta = tomet_aozora::AozoraMetadata::new("走れメロス", "太宰治").with_id(1567);
+        let tmt = converter.convert("メロスは激怒した。\n", &meta);
+        assert!(validate_str(&tmt).is_ok(), "aozora output failed: {tmt}");
+    }
+
+    #[test]
+    fn test_validate_wikitext_converter_output() {
+        let converter = tomet_wikitext::WikiToTometConverter::new();
+        let meta = tomet_wikitext::WikitextMetadata::new("テスト国").with_id(789);
+        let tmt = converter.convert("国です。\n[[Category:アジアの国]]\n", &meta);
+        assert!(validate_str(&tmt).is_ok(), "wikitext output failed: {tmt}");
     }
 }

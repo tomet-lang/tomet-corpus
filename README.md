@@ -21,7 +21,7 @@ Supported corpus sources include:
 - `crates/tomet-convert-aozora` -- Converts Aozora Bunko formatting to Tomet.
 - `crates/downloader` -- Fetches and caches remote corpora datasets.
 - `crates/tomet-synth` -- Deterministic synthetic corpus generator for benchmarks and stress tests (dependency-free; consumers use it as a dev-dependency).
-- `data` -- Corpus data. `data/handwritten` is tracked; `data/wikipedia`, `data/aozora` (generated) and `data/examples` (fetched with `tomet-corpus examples sync`, or `just examples`) are local and git-ignored.
+- `data` -- Corpus data. `data/handwritten` is tracked; `data/wikipedia`, `data/aozora` (generated) and `data/examples` (fetched with `sisho-corpus examples sync`, or `just examples`) are local and git-ignored.
 
 ## Building and Running
 
@@ -40,7 +40,7 @@ cargo test --workspace
 ### Convert corpus
 
 ```bash
-cargo run -p tomet-corpus-cli -- sync
+cargo run -p sisho-corpus -- sync
 ```
 
 ## Synthetic Corpora
